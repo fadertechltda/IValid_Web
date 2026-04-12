@@ -1,4 +1,4 @@
-namespace WEV_API
+namespace WEB_API
 {
     public class WeatherForecast
     {

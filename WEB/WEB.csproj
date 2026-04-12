@@ -6,4 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="H.Necessaire.Runtime.Google.FirestoreDB" Version="3.0.19" />
+  </ItemGroup>
+
 </Project>

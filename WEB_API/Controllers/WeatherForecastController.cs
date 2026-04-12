@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 
-namespace WEV_API.Controllers
+namespace WEB_API.Controllers
 {
     [ApiController]
     [Route("[controller]")]

@@ -361,3 +361,7 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+
+# Segurança: Não subir chaves privadas do Firebase
+Chave/
+**/Chave/*.json
