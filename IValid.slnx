@@ -1,0 +1,7 @@
+<Solution>
+  <Project Path="DOMAIN/DOMAIN.csproj" />
+  <Project Path="REPOSITORY/REPOSITORY.csproj" />
+  <Project Path="SERVICE/SERVICE.csproj" />
+  <Project Path="WEB/WEB.csproj" />
+  <Project Path="WEV_API/WEB_API.csproj" />
+</Solution>
