@@ -13,6 +13,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\REPOSITORY\REPOSITORY.csproj" />
+    <ProjectReference Include="..\SERVICE\SERVICE.csproj" />
   </ItemGroup>
 
 </Project>
