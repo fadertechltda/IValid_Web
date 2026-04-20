@@ -1,28 +1,31 @@
-using Google.Cloud.Firestore;
-
 var builder = WebApplication.CreateBuilder(args);
 
-var firebasePath = builder.Configuration["Firebase:CredentialsPath"];
-var projectId = builder.Configuration["Firebase:ProjectId"];
-
-if (!string.IsNullOrEmpty(firebasePath))
+// REMOVIDO: O projeto WEB não usa mais a chave do Firebase!
+// ADICIONADO: Configuração para falar com a API
+builder.Services.AddHttpClient("IValidApi", client =>
 {
-    Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", firebasePath);
-}
+    // Coloque aqui a URL onde a sua WEB_API roda (ex: https://localhost:7001/)
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7001/");
+});
 
-builder.Services.AddScoped(_ => FirestoreDb.Create(projectId));
-builder.Services.AddControllers();
-builder.Services.AddOpenApi();
+builder.Services.AddControllersWithViews();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
+if (!app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseExceptionHandler("/Home/Error");
+    app.UseHsts();
 }
 
 app.UseHttpsRedirection();
+app.UseRouting();
 app.UseAuthorization();
-app.MapControllers();
+app.MapStaticAssets();
+
+app.MapControllerRoute(
+    name: "default",
+    pattern: "{controller=Home}/{action=Index}/{id?}")
+    .WithStaticAssets();
 
 app.Run();

@@ -1,7 +1,9 @@
 using Google.Cloud.Firestore;
+using REPOSITORY.Mapeadores.Produto; // Adicione o namespace correto dos seus mapeadores
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Pega os dados do appsettings.json
 var firebasePath = builder.Configuration["Firebase:CredentialsPath"];
 var projectId = builder.Configuration["Firebase:ProjectId"];
 
@@ -10,25 +12,24 @@ if (!string.IsNullOrEmpty(firebasePath))
     Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", firebasePath);
 }
 
-builder.Services.AddScoped(_ => FirestoreDb.Create(projectId));
-builder.Services.AddControllersWithViews();
+// Registro do Banco (Singleton é melhor para o Firebase)
+builder.Services.AddSingleton(_ => FirestoreDb.Create(projectId));
+
+// REGISTRO DOS SEUS MAPEADORES (Fundamental para não dar erro na Controller)
+builder.Services.AddScoped<IProdutoMapeador, ProdutoMapeador>();
+
+builder.Services.AddControllers();
+builder.Services.AddOpenApi();
 
 var app = builder.Build();
 
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
-    app.UseHsts();
+    app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-app.UseRouting();
 app.UseAuthorization();
-app.MapStaticAssets();
-
-app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Home}/{action=Index}/{id?}")
-    .WithStaticAssets();
+app.MapControllers();
 
 app.Run();

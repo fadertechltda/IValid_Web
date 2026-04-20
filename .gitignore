@@ -365,3 +365,6 @@ FodyWeavers.xsd
 # Segurança: Não subir chaves privadas do Firebase
 Chave/
 **/Chave/*.json
+
+# Chave do Firebase
+firebase-key.json
