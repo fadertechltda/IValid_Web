@@ -1,4 +1,4 @@
-﻿using DOMAIN.Model;
+using DOMAIN.Model;
 using DOMAIN.Validador.Produto;
 using SERVICE.Processo;
 
@@ -11,6 +11,8 @@ namespace SERVICE.Fachada
         
         public async Task CadastrarProdutos(ProdutoModel produto)
         {
+            _produtoProcesso.CalcularStatusEPrecos(produto);
+
             _validador.AssineRegrasInclusao();
 
             var resultado = await _validador.ValidateAsync(produto);
@@ -25,6 +27,9 @@ namespace SERVICE.Fachada
 
         public async Task AtualizarProdutos(ProdutoModel produto)
         {
+            // Recalcula Status, PrecoPromocao e DescricaoPorcentual antes de validar
+            _produtoProcesso.CalcularStatusEPrecos(produto);
+
             _validador.AssineRegrasAtualizacao();
 
             var resultado = await _validador.ValidateAsync(produto);

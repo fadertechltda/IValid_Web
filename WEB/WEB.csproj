@@ -10,4 +10,8 @@
     <PackageReference Include="H.Necessaire.Runtime.Google.FirestoreDB" Version="3.0.19" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\DOMAIN\DOMAIN.csproj" />
+  </ItemGroup>
+
 </Project>

@@ -24,7 +24,7 @@ namespace WEB_API.Controllers
             }
         }
 
-        [HttpPut]
+        [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromBody] ProdutoModel produto)
         {
             try

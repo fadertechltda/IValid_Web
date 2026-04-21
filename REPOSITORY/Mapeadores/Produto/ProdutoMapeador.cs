@@ -1,4 +1,4 @@
-﻿using DOMAIN.Model;
+using DOMAIN.Model;
 using Google.Cloud.Firestore;
 
 namespace REPOSITORY.Mapeadores.Produto
@@ -9,11 +9,13 @@ namespace REPOSITORY.Mapeadores.Produto
 
         public async Task CadastrarAsync(ProdutoModel produto)
         {
+            NormalizarDatas(produto);
             CollectionReference collection = _firestoreDb.Collection("produtos");
             await collection.AddAsync(produto);
         }
         public async Task AtualizarAsync(ProdutoModel produto)
         {
+            NormalizarDatas(produto);
             DocumentReference docRef = _firestoreDb.Collection("produtos").Document(produto.Id);
             await docRef.SetAsync(produto, SetOptions.MergeAll);
         }
@@ -53,5 +55,10 @@ namespace REPOSITORY.Mapeadores.Produto
 
             return null;
         }      
+     
+        private static void NormalizarDatas(ProdutoModel produto)
+        {
+            produto.DataVencimento = DateTime.SpecifyKind(produto.DataVencimento, DateTimeKind.Utc);
+        }
     }
 }

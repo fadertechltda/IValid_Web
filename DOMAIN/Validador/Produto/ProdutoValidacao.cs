@@ -10,80 +10,56 @@ namespace DOMAIN.Validador.Produto
         {
             RuleFor(produto => produto.Nome)
                 .NotEmpty()
-                .WithMessage("O nome do produto não pode ser vazio");
-
-            RuleFor(produto => produto.Status)
-                .Must(status => new[] { "Ativo", "Inativo", "Esgotado" }
-                .Contains(status));
+                .WithMessage("O nome do produto não pode ser vazio.");
 
             RuleFor(produto => produto.Preco)
                 .GreaterThan(0)
-                .WithMessage("O valor do produto deve ser maior que 0");
-
-            RuleFor(produto => produto.PrecoPromocao)
-                .LessThan(produto => produto.Preco)
-                .WithMessage("O preço promocional deve ser menor que o preço original.");
-
-            RuleFor(p => p.PrecoPromocao)
-                .GreaterThan(0);
+                .WithMessage("O valor do produto deve ser maior que 0.");
 
             RuleFor(produto => produto.DataVencimento)
                 .GreaterThan(DateTime.Now)
                 .WithMessage("O produto já está vencido no momento do cadastro.");
 
-            RuleFor(produto => produto.DiaValidade)
-                .GreaterThanOrEqualTo(1);
-
             RuleFor(produto => produto.Quantidade)
                 .GreaterThanOrEqualTo(0)
-                .WithMessage("Quantidade de produtos não pode ser negativa");
-
-            RuleFor(produto => produto.DescricaoPorcentual)
-                .InclusiveBetween(0, 100);
+                .WithMessage("Quantidade de produtos não pode ser negativa.");
 
             RuleFor(produto => produto.UrlImagem)
                 .Must(uri => Uri.TryCreate(uri, UriKind.Absolute, out _))
-                .When(produto => !string.IsNullOrEmpty(produto.UrlImagem));
+                .When(produto => !string.IsNullOrEmpty(produto.UrlImagem))
+                .WithMessage("A URL da imagem não é válida.");
+
         }
 
         public override void AssineRegrasAtualizacao()
         {
+            RuleFor(produto => produto.Id)
+                .NotEmpty()
+                .WithMessage("O Id do produto é obrigatório para atualização.");
+
             RuleFor(produto => produto.Nome)
                .NotEmpty()
-               .WithMessage("O nome do produto não pode ser vazio");
-
-            RuleFor(produto => produto.Status)
-                .Must(status => new[] { "Ativo", "Inativo", "Esgotado" }
-                .Contains(status));
+               .WithMessage("O nome do produto não pode ser vazio.");
 
             RuleFor(produto => produto.Preco)
                 .GreaterThan(0)
-                .WithMessage("O valor do produto deve ser maior que 0");
-
-            RuleFor(produto => produto.PrecoPromocao)
-                .LessThan(produto => produto.Preco)
-                .WithMessage("O preço promocional deve ser menor que o preço original.");
-
-            RuleFor(p => p.PrecoPromocao)
-                .GreaterThan(0);
+                .WithMessage("O valor do produto deve ser maior que 0.");
 
             RuleFor(produto => produto.DataVencimento)
                 .GreaterThan(DateTime.Now)
-                .WithMessage("O produto já está vencido no momento do cadastro.");
-
-            RuleFor(produto => produto.DiaValidade)
-                .GreaterThanOrEqualTo(1);
+                .WithMessage("A data de vencimento informada já está no passado.");
 
             RuleFor(produto => produto.Quantidade)
                 .GreaterThanOrEqualTo(0)
-                .WithMessage("Quantidade de produtos não pode ser negativa");
-
-            RuleFor(produto => produto.DescricaoPorcentual)
-                .InclusiveBetween(0, 100);
+                .WithMessage("Quantidade de produtos não pode ser negativa.");
 
             RuleFor(produto => produto.UrlImagem)
                 .Must(uri => Uri.TryCreate(uri, UriKind.Absolute, out _))
-                .When(produto => !string.IsNullOrEmpty(produto.UrlImagem));
+                .When(produto => !string.IsNullOrEmpty(produto.UrlImagem))
+                .WithMessage("A URL da imagem não é válida.");
+
+            // Status, PrecoPromocao e DescricaoPorcentual são recalculados
+            // automaticamente por CalcularStatusEPrecos antes desta validação.
         }
 
         public override void AssineRegrasExclusao()

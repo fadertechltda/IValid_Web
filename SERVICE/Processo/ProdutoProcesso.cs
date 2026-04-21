@@ -9,19 +9,18 @@ namespace SERVICE.Processo
 
         public async Task CadastrarProduto(ProdutoModel produto)
         {
-            ProcessarVencimentoEStatus(produto);
+            CalcularStatusEPrecos(produto);
             await _produtoMapeador.CadastrarAsync(produto);
         }
 
         public async Task AtualizarProduto(ProdutoModel produto)
         {
-            ProcessarVencimentoEStatus(produto);
+            CalcularStatusEPrecos(produto);
             await _produtoMapeador.AtualizarAsync(produto);
         }
 
         public async Task DeletarProduto(ProdutoModel produto)
-        {
-            ProcessarVencimentoEStatus(produto);
+        {           
             await _produtoMapeador.DeletarAsync(produto);
         }
 
@@ -31,7 +30,7 @@ namespace SERVICE.Processo
 
             foreach(var produto in listaDeProdutos)
             {
-                ProcessarVencimentoEStatus(produto);
+                CalcularStatusEPrecos(produto);
             }
 
             return listaDeProdutos;
@@ -43,13 +42,13 @@ namespace SERVICE.Processo
 
             if (produto != null)
             {
-                ProcessarVencimentoEStatus(produto);
+                CalcularStatusEPrecos(produto);
             }
 
             return produto;
         }
 
-        private static void ProcessarVencimentoEStatus(ProdutoModel produto)
+        public void CalcularStatusEPrecos(ProdutoModel produto)
         {
             int diasParaVencer = (produto.DataVencimento - DateTime.Now.Date).Days;
 

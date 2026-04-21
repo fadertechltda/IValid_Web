@@ -1,11 +1,8 @@
 var builder = WebApplication.CreateBuilder(args);
 
-// REMOVIDO: O projeto WEB não usa mais a chave do Firebase!
-// ADICIONADO: Configuração para falar com a API
 builder.Services.AddHttpClient("IValidApi", client =>
 {
-    // Coloque aqui a URL onde a sua WEB_API roda (ex: https://localhost:7001/)
-    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7001/");
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7183/");
 });
 
 builder.Services.AddControllersWithViews();
