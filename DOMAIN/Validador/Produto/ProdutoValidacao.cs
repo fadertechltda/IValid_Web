@@ -1,4 +1,4 @@
-﻿using DOMAIN.Model;
+using DOMAIN.Model;
 using DOMAIN.Validador.Abstrato;
 using FluentValidation;
 

@@ -1,4 +1,4 @@
-﻿using DOMAIN.Model;
+using DOMAIN.Model;
 using REPOSITORY.Mapeadores.Produto;
 
 namespace SERVICE.Processo
@@ -9,16 +9,19 @@ namespace SERVICE.Processo
 
         public async Task CadastrarProduto(ProdutoModel produto)
         {
+            ProcessarVencimentoEStatus(produto);
             await _produtoMapeador.CadastrarAsync(produto);
         }
 
         public async Task AtualizarProduto(ProdutoModel produto)
         {
+            ProcessarVencimentoEStatus(produto);
             await _produtoMapeador.AtualizarAsync(produto);
         }
 
         public async Task DeletarProduto(ProdutoModel produto)
         {
+            ProcessarVencimentoEStatus(produto);
             await _produtoMapeador.DeletarAsync(produto);
         }
 
@@ -37,6 +40,12 @@ namespace SERVICE.Processo
         public async Task<ProdutoModel?> ListarProdutoPorId(string id)
         {
             var produto = await _produtoMapeador.ListarPorIdAsync(id);
+
+            if (produto != null)
+            {
+                ProcessarVencimentoEStatus(produto);
+            }
+
             return produto;
         }
 
@@ -46,19 +55,19 @@ namespace SERVICE.Processo
 
             if (diasParaVencer <= 10)
             {
-                produto.Status = "Vermelho";
+                produto.Status = "VERMELHO";
                 produto.DescricaoPorcentual = 40;
                 produto.PrecoPromocao = produto.Preco * 0.50;
             }
             else if (diasParaVencer <= 20)
             {
-                produto.Status = "Amarelo";
+                produto.Status = "AMARELO";
                 produto.DescricaoPorcentual = 20;
-                produto.PrecoPromocao = produto.Preco * 0.20;
+                produto.PrecoPromocao = produto.Preco * 0.80;
             }
             else
             {
-                produto.Status = "Verde";
+                produto.Status = "VERDE";
                 produto.DescricaoPorcentual = 0;
                 produto.PrecoPromocao = produto.Preco;
             }

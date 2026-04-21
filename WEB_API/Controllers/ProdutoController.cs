@@ -1,4 +1,4 @@
-﻿using DOMAIN.Model;
+using DOMAIN.Model;
 using Microsoft.AspNetCore.Mvc;
 using SERVICE.Fachada;
 
@@ -39,13 +39,15 @@ namespace WEB_API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromBody] string id)
+        public async Task<IActionResult> Delete(string id)
         {
             try
             {
                 ProdutoModel? produto = await _produtoFachada.ListarProdutoPorId(id);
 
                 if (produto == null) return NotFound("Produto não encontrado.");
+
+                await _produtoFachada.DeletarProdutos(produto);
 
                 return Ok("Produto deletado com sucesso");
             }
@@ -58,8 +60,8 @@ namespace WEB_API.Controllers
         [HttpGet]
         public async Task<IActionResult> Get()
         {
-            Task<List<ProdutoModel>> produto = _produtoFachada.ListarProdutos();
-            return Ok(produto);
+            var produtos = await _produtoFachada.ListarProdutos();
+            return Ok(produtos);
         }
 
         [HttpGet("{id}")]

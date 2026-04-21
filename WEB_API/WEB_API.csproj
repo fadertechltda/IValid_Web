@@ -9,6 +9,7 @@
   <ItemGroup>
     <PackageReference Include="H.Necessaire.Runtime.Google.FirestoreDB" Version="3.0.19" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.2" />
+    <PackageReference Include="Scalar.AspNetCore" Version="2.14.1" />
   </ItemGroup>
 
   <ItemGroup>
