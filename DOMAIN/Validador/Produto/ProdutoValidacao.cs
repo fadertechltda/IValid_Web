@@ -17,7 +17,7 @@ namespace DOMAIN.Validador.Produto
                 .WithMessage("O valor do produto deve ser maior que 0.");
 
             RuleFor(produto => produto.DataVencimento)
-                .GreaterThan(DateTime.Now)
+                .GreaterThanOrEqualTo(DateTime.Today)
                 .WithMessage("O produto já está vencido no momento do cadastro.");
 
             RuleFor(produto => produto.Quantidade)
@@ -46,7 +46,7 @@ namespace DOMAIN.Validador.Produto
                 .WithMessage("O valor do produto deve ser maior que 0.");
 
             RuleFor(produto => produto.DataVencimento)
-                .GreaterThan(DateTime.Now)
+                .GreaterThanOrEqualTo(DateTime.Today)
                 .WithMessage("A data de vencimento informada já está no passado.");
 
             RuleFor(produto => produto.Quantidade)
@@ -58,8 +58,6 @@ namespace DOMAIN.Validador.Produto
                 .When(produto => !string.IsNullOrEmpty(produto.UrlImagem))
                 .WithMessage("A URL da imagem não é válida.");
 
-            // Status, PrecoPromocao e DescricaoPorcentual são recalculados
-            // automaticamente por CalcularStatusEPrecos antes desta validação.
         }
 
         public override void AssineRegrasExclusao()

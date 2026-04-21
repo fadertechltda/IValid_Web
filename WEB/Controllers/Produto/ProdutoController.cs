@@ -91,7 +91,7 @@ namespace WEB.Controllers.Produto
                 var json = JsonSerializer.Serialize(produto);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync(_apiUrl, content);
+                var response = await _httpClient.PutAsync($"{_apiUrl}/{id}", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -100,7 +100,9 @@ namespace WEB.Controllers.Produto
                 }
 
                 var errorMsg = await response.Content.ReadAsStringAsync();
-                ModelState.AddModelError(string.Empty, $"Erro retornado pela API: {errorMsg}");
+                Console.WriteLine($"\n[ERRO PUT API] StatusCode: {response.StatusCode}");
+                Console.WriteLine($"[ERRO PUT API] ErrorMsg: {errorMsg}\n");
+                ModelState.AddModelError(string.Empty, $"Erro retornado pela API: {(string.IsNullOrEmpty(errorMsg) ? "Mensagem vazia, olhe o console" : errorMsg)}");
             }
             catch (Exception ex)
             {

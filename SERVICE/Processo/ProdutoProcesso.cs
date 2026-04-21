@@ -50,7 +50,8 @@ namespace SERVICE.Processo
 
         public void CalcularStatusEPrecos(ProdutoModel produto)
         {
-            int diasParaVencer = (produto.DataVencimento - DateTime.Now.Date).Days;
+            int diasParaVencer = (produto.DataVencimento.Date - DateTime.UtcNow.Date).Days;   
+            produto.DiaValidade = diasParaVencer > 0 ? diasParaVencer : 0;
 
             if (diasParaVencer <= 10)
             {
