@@ -1,4 +1,4 @@
-using DOMAIN.Model;
+using DOMAIN.Model.Produto;
 using REPOSITORY.Mapeadores.Produto;
 
 namespace SERVICE.Processo

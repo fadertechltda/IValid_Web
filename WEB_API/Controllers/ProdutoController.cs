@@ -1,4 +1,4 @@
-using DOMAIN.Model;
+using DOMAIN.Model.Produto;
 using Microsoft.AspNetCore.Mvc;
 using SERVICE.Fachada;
 

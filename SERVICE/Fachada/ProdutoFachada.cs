@@ -1,4 +1,4 @@
-using DOMAIN.Model;
+using DOMAIN.Model.Produto;
 using DOMAIN.Validador.Produto;
 using SERVICE.Processo;
 

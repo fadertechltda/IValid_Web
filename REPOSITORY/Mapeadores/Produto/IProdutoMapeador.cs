@@ -1,5 +1,5 @@
 ﻿using DOMAIN.Interface;
-using DOMAIN.Model;
+using DOMAIN.Model.Produto;
 
 namespace REPOSITORY.Mapeadores.Produto
 {

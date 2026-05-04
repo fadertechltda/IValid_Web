@@ -1,7 +1,6 @@
 using Google.Cloud.Firestore;
-using System;
 
-namespace DOMAIN.Model
+namespace DOMAIN.Model.Produto
 {
     [FirestoreData]
     public class ProdutoModel

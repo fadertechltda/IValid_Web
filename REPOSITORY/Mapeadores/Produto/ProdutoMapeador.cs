@@ -1,4 +1,4 @@
-using DOMAIN.Model;
+using DOMAIN.Model.Produto;
 using Google.Cloud.Firestore;
 
 namespace REPOSITORY.Mapeadores.Produto
