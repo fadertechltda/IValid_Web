@@ -16,7 +16,6 @@
 <div class="row justify-content-center">
     <div class="col-xl-8">
 
-        <!-- Status Banner -->
         <div class="mb-4 d-flex align-items-center gap-3 p-3"
              style="background:white; border-radius:14px; box-shadow:0 2px 10px rgba(0,0,0,0.06); border:1px solid #eef0f4;">
             @if (!string.IsNullOrEmpty(Model?.UrlImagem))
@@ -60,7 +59,6 @@
 
                     <div class="row g-4">
 
-                        <!-- Nome -->
                         <div class="col-12">
                             <label class="form-label-custom">Nome do Produto *</label>
                             <input asp-for="Nome" class="form-control form-control-custom w-100"
@@ -68,7 +66,6 @@
                             <span asp-validation-for="Nome" class="text-danger" style="font-size:12px;"></span>
                         </div>
 
-                        <!-- Preço Original -->
                         <div class="col-md-6">
                             <label class="form-label-custom">Preço Original (R$) *</label>
                             <div class="input-group">
@@ -80,7 +77,6 @@
                             <span asp-validation-for="Preco" class="text-danger" style="font-size:12px;"></span>
                         </div>
 
-                        <!-- Quantidade -->
                         <div class="col-md-6">
                             <label class="form-label-custom">Quantidade em Estoque *</label>
                             <input asp-for="Quantidade" type="number" min="0"
@@ -88,7 +84,6 @@
                             <span asp-validation-for="Quantidade" class="text-danger" style="font-size:12px;"></span>
                         </div>
 
-                        <!-- Data de Vencimento -->
                         <div class="col-12">
                             <label class="form-label-custom">Data de Vencimento *</label>
                             <input asp-for="DataVencimento" type="date"
@@ -96,7 +91,6 @@
                             <span asp-validation-for="DataVencimento" class="text-danger" style="font-size:12px;"></span>
                         </div>
 
-                        <!-- URL Imagem -->
                         <div class="col-12">
                             <label class="form-label-custom">URL da Imagem <span style="color:#aaa;font-weight:400;">(opcional)</span></label>
                             <input asp-for="UrlImagem" type="url"
@@ -105,7 +99,6 @@
                             <span asp-validation-for="UrlImagem" class="text-danger" style="font-size:12px;"></span>
                         </div>
 
-                        <!-- Info campos automáticos -->
                         <div class="col-12">
                             <div style="background:linear-gradient(135deg,#fff8e1,#fff3e0);border-radius:12px;padding:16px;border-left:4px solid var(--amarelo);">
                                 <div style="font-size:12px;font-weight:700;color:#e65100;margin-bottom:8px;">
@@ -128,7 +121,6 @@
                             </div>
                         </div>
 
-                        <!-- Botões -->
                         <div class="col-12 d-flex justify-content-end gap-3 pt-2">
                             <a asp-controller="Produto" asp-action="Index" class="btn-outline-custom" style="text-decoration:none;">
                                 <i class="fas fa-times me-1"></i> Cancelar

@@ -17,7 +17,6 @@
 <div class="row justify-content-center">
     <div class="col-xl-6">
 
-        <!-- Warning Banner -->
         <div class="mb-4 p-4 text-center"
              style="background:linear-gradient(135deg,#ffebee,#fff8e1);border-radius:16px;border:2px dashed var(--vermelho);">
             <div style="width:64px;height:64px;background:var(--vermelho-light);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px;">
@@ -27,7 +26,6 @@
             <div style="font-size:13px;color:#888;margin-top:4px;">Esta ação é permanente e não poderá ser desfeita.</div>
         </div>
 
-        <!-- Product Card -->
         <div class="admin-card mb-4">
             <div class="admin-card-header">
                 <h2 class="admin-card-title"><i class="fas fa-box-open me-2" style="color:#aaa;"></i>Dados do Produto</h2>
@@ -89,7 +87,6 @@
             </div>
         </div>
 
-        <!-- Confirm Form -->
         <form asp-controller="Produto" asp-action="Delete" asp-route-id="@Model?.Id" method="post">
             @Html.AntiForgeryToken()
             <div class="d-flex gap-3">

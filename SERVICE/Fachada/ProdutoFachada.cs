@@ -27,7 +27,6 @@ namespace SERVICE.Fachada
 
         public async Task AtualizarProdutos(ProdutoModel produto)
         {
-            // Recalcula Status, PrecoPromocao e DescricaoPorcentual antes de validar
             _produtoProcesso.CalcularStatusEPrecos(produto);
 
             _validador.AssineRegrasAtualizacao();

@@ -26,7 +26,6 @@
         * { font-family: 'Inter', sans-serif; }
         body { background: var(--bg-page); overflow-x: hidden; }
 
-        /* ====== SIDEBAR ====== */
         #sidebar {
             width: var(--sidebar-width);
             height: 100vh;
@@ -142,7 +141,6 @@
         .user-name { color: white; font-size: 13px; font-weight: 600; }
         .user-role { color: var(--text-muted-custom); font-size: 11px; }
 
-        /* ====== TOPBAR ====== */
         #topbar {
             position: fixed;
             top: 0;
@@ -189,7 +187,6 @@
             border: 2px solid white;
         }
 
-        /* ====== MAIN CONTENT ====== */
         #main-content {
             margin-left: var(--sidebar-width);
             padding-top: var(--topbar-height);
@@ -198,7 +195,6 @@
 
         .page-wrapper { padding: 28px; }
 
-        /* ====== CARDS ====== */
         .admin-card {
             background: white;
             border-radius: 16px;
@@ -217,7 +213,6 @@
 
         .admin-card-title { font-size: 15px; font-weight: 700; color: #1a1a2e; margin: 0; }
 
-        /* ====== STAT CARDS ====== */
         .stat-card {
             background: white;
             border-radius: 16px;
@@ -261,7 +256,6 @@
         .stat-value { font-size: 28px; font-weight: 800; color: #1a1a2e; line-height: 1; }
         .stat-label { font-size: 12px; font-weight: 500; color: var(--text-muted-custom); margin-top: 4px; }
 
-        /* ====== STATUS BADGES ====== */
         .badge-vermelho { background: var(--vermelho-light); color: var(--vermelho); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
         .badge-amarelo  { background: var(--amarelo-light); color: #e65100; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
         .badge-verde    { background: var(--verde-light); color: var(--verde); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
@@ -270,7 +264,6 @@
         .badge-amarelo::before  { content: ''; width: 6px; height: 6px; background: var(--amarelo); border-radius: 50%; }
         .badge-verde::before    { content: ''; width: 6px; height: 6px; background: var(--verde); border-radius: 50%; }
 
-        /* ====== TABLE ====== */
         .admin-table thead th {
             font-size: 11px;
             font-weight: 700;
@@ -293,7 +286,6 @@
         .admin-table tbody tr:hover { background: #fafbff; }
         .admin-table tbody tr:last-child td { border-bottom: none; }
 
-        /* ====== BUTTONS ====== */
         .btn-danger-custom {
             background: var(--vermelho);
             color: white;
@@ -360,7 +352,6 @@
         .btn-icon.view { background: var(--verde-light); color: var(--verde); }
         .btn-icon.view:hover { background: var(--verde); color: white; }
 
-        /* ====== FORM ====== */
         .form-label-custom { font-size: 12px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .form-control-custom {
             border: 1.5px solid #e8eaef;
@@ -372,7 +363,6 @@
         }
         .form-control-custom:focus { border-color: var(--vermelho); box-shadow: 0 0 0 3px rgba(229,57,53,0.12); outline: none; }
 
-        /* ====== TOAST / ALERTS ====== */
         .alert-admin {
             border-radius: 12px;
             border: none;
@@ -386,7 +376,6 @@
         .alert-admin.success { background: var(--verde-light); color: var(--verde); }
         .alert-admin.danger  { background: var(--vermelho-light); color: var(--vermelho); }
 
-        /* ====== Responsive ====== */
         @@media (max-width: 992px) {
             #sidebar { transform: translateX(-100%); }
             #sidebar.show { transform: translateX(0); }
@@ -396,7 +385,6 @@
     @await RenderSectionAsync("Styles", required: false)
 </head>
 <body>
-    <!-- SIDEBAR -->
     <aside id="sidebar">
         <div class="sidebar-brand">
             <div class="brand-logo">I</div>
@@ -449,7 +437,6 @@
         </div>
     </aside>
 
-    <!-- TOPBAR -->
     <header id="topbar">
         <div>
             <div class="topbar-title">@(ViewData["PageTitle"] ?? ViewData["Title"] ?? "Painel")</div>
@@ -467,7 +454,6 @@
         </div>
     </header>
 
-    <!-- MAIN -->
     <main id="main-content">
         <div class="page-wrapper">
             @if (TempData["Sucesso"] != null)
