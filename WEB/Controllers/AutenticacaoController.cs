@@ -139,15 +139,24 @@ namespace WEB.Controllers
             try
             {
                 using var doc = JsonDocument.Parse(conteudo);
-                if (doc.RootElement.TryGetProperty("informacaoAdicional", out var msgElement))
+                var root = doc.RootElement;
+                if (root.TryGetProperty("informacaoAdicional", out var msgElement) || 
+                    root.TryGetProperty("InformacaoAdicional", out msgElement))
                 {
-                    return msgElement.GetString() ?? "Email ou senha inválidos.";
+                    return msgElement.GetString() ?? "Ocorreu um erro ao processar a requisição.";
                 }
-                return "Email ou senha inválidos.";
+              
+                if (root.TryGetProperty("title", out var titleElement))
+                {
+                    return titleElement.GetString() ?? "Ocorreu um erro de validação.";
+                }
+
+                return "Ocorreu um erro inesperado no servidor.";
             }
             catch
             {
-                return "Email ou senha inválidos.";
+                var msgRaw = conteudo.Length > 200 ? conteudo.Substring(0, 200) + "..." : conteudo;
+                return $"Falha na comunicação com a API. Retorno bruto: {msgRaw}";
             }
         }
     }

@@ -17,6 +17,8 @@ if (!string.IsNullOrEmpty(firebasePath))
 
 builder.Services.AddSingleton(_ => FirestoreDb.Create(projectId));
 
+builder.Services.AddHttpClient();
+
 builder.Services.AddScoped<IProdutoMapeador, ProdutoMapeador>();
 builder.Services.AddScoped<ProdutoProcesso>();
 builder.Services.AddScoped<ProdutoFachada>();
