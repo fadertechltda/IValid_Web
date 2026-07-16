@@ -254,7 +254,12 @@
 
                 <div class="mb-3">
                     <label asp-for="Senha" class="form-label-custom">Senha</label>
-                    <input asp-for="Senha" type="password" class="form-control form-control-custom" placeholder="••••••••" required autocomplete="current-password" />
+                    <div style="position: relative;">
+                        <input asp-for="Senha" type="password" id="campoSenha" class="form-control form-control-custom" placeholder="••••••••" required autocomplete="current-password" />
+                        <button type="button" onclick="toggleSenha('campoSenha', this)" style="position: absolute; right: 10px; top: 12px; border: none; background: transparent; color: var(--text-muted-custom); cursor: pointer; outline: none;">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <a href="#" class="forgot-password">Esqueceu a senha?</a>
@@ -270,5 +275,20 @@
         </div>
     </div>
 
+    <script>
+        function toggleSenha(inputId, btn) {
+            var input = document.getElementById(inputId);
+            var icon = btn.querySelector('i');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
 </html>

@@ -264,12 +264,22 @@
 
                 <div>
                     <label asp-for="Senha" class="form-label-custom">Senha</label>
-                    <input asp-for="Senha" type="password" class="form-control form-control-custom" placeholder="••••••••" required autocomplete="new-password" />
+                    <div style="position: relative;">
+                        <input asp-for="Senha" type="password" id="campoSenha" class="form-control form-control-custom" placeholder="••••••••" required autocomplete="new-password" />
+                        <button type="button" onclick="toggleSenha('campoSenha', this)" style="position: absolute; right: 10px; top: 10px; border: none; background: transparent; color: var(--text-muted-custom); cursor: pointer; outline: none;">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <div>
                     <label asp-for="ConfirmarSenha" class="form-label-custom">Confirmar Senha</label>
-                    <input asp-for="ConfirmarSenha" type="password" class="form-control form-control-custom" placeholder="••••••••" required autocomplete="new-password" />
+                    <div style="position: relative;">
+                        <input asp-for="ConfirmarSenha" type="password" id="campoConfirmarSenha" class="form-control form-control-custom" placeholder="••••••••" required autocomplete="new-password" />
+                        <button type="button" onclick="toggleSenha('campoConfirmarSenha', this)" style="position: absolute; right: 10px; top: 10px; border: none; background: transparent; color: var(--text-muted-custom); cursor: pointer; outline: none;">
+                            <i class="far fa-eye"></i>
+                        </button>
+                    </div>
                 </div>
 
                 <button type="submit" class="btn-login">
@@ -283,5 +293,20 @@
         </div>
     </div>
 
+    <script>
+        function toggleSenha(inputId, btn) {
+            var input = document.getElementById(inputId);
+            var icon = btn.querySelector('i');
+            if (input.type === "password") {
+                input.type = "text";
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+            } else {
+                input.type = "password";
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
+        }
+    </script>
 </body>
 </html>

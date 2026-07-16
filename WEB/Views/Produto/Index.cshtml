@@ -15,12 +15,10 @@
     <div class="admin-card-header">
         <h2 class="admin-card-title"><i class="fas fa-box-open me-2" style="color:var(--vermelho)"></i>Lista de Produtos</h2>
         <div class="d-flex gap-2 align-items-center">
-            <div class="input-group" style="width:220px;">
-                <span class="input-group-text" style="border-radius:10px 0 0 10px; border:1.5px solid #e8eaef; background:#f8f9fc; border-right:none;">
-                    <i class="fas fa-search text-muted" style="font-size:12px;"></i>
-                </span>
-                <input type="text" id="campoBusca" class="form-control-custom" placeholder="Buscar produto..."
-                       style="border-left:none; border-radius:0 10px 10px 0; height:38px;" oninput="filtrarTabela()">
+            <div class="position-relative" style="width: 250px;">
+                <i class="fas fa-search text-muted position-absolute" style="left: 14px; top: 50%; transform: translateY(-50%); font-size: 14px;"></i>
+                <input type="text" id="campoBusca" class="form-control" placeholder="Buscar produto..."
+                       style="padding-left: 38px; border-radius: 10px; border: 1.5px solid #e8eaef; font-size: 14px; height: 42px; box-shadow: none;" oninput="filtrarTabela()">
             </div>
             <a asp-controller="Produto" asp-action="Create" class="btn-danger-custom d-flex align-items-center gap-2" style="text-decoration:none;">
                 <i class="fas fa-plus"></i> Novo Produto
@@ -112,10 +110,15 @@
 
 @section Scripts {
 <script>
+    function removerAcentos(texto) {
+        return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+    }
+
     function filtrarTabela() {
-        const termoBusca = document.getElementById('campoBusca').value.toLowerCase();
+        const termoBusca = removerAcentos(document.getElementById('campoBusca').value.toLowerCase());
         document.querySelectorAll('#tabelaProdutos tbody tr').forEach(linha => {
-            linha.style.display = linha.textContent.toLowerCase().includes(termoBusca) ? '' : 'none';
+            const textoLinha = removerAcentos(linha.textContent.toLowerCase());
+            linha.style.display = textoLinha.includes(termoBusca) ? '' : 'none';
         });
     }
 </script>
