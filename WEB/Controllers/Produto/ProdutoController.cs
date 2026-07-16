@@ -4,8 +4,11 @@ using System.Text;
 using System.Text.Json;
 using Excecoes;
 
+using Microsoft.AspNetCore.Authorization;
+
 namespace WEB.Controllers.Produto
 {
+    [Authorize]
     public class ProdutoController(IHttpClientFactory httpClientFactory) : Controller
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("IValidApi");

@@ -22,6 +22,10 @@ builder.Services.AddScoped<ProdutoProcesso>();
 builder.Services.AddScoped<ProdutoFachada>();
 builder.Services.AddScoped<ProdutoValidacao>();
 
+builder.Services.AddScoped<REPOSITORY.Mapeadores.Usuario.IUsuarioMapeador, REPOSITORY.Mapeadores.Usuario.UsuarioMapeador>();
+builder.Services.AddScoped<UsuarioProcesso>();
+builder.Services.AddScoped<UsuarioFachada>();
+
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
