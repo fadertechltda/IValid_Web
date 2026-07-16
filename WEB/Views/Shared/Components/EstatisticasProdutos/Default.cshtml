@@ -1,0 +1,33 @@
+@using WEB.ComponentesVisuais
+@model ResumoEstatisticas
+
+<div class="row g-3 mb-4">
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card danger">
+            <div class="stat-icon danger"><i class="fas fa-fire"></i></div>
+            <div class="stat-value">@Model.TotalVermelho</div>
+            <div class="stat-label">🔴 Críticos</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card warning">
+            <div class="stat-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+            <div class="stat-value">@Model.TotalAmarelo</div>
+            <div class="stat-label">🟡 Em Atenção</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card success">
+            <div class="stat-icon success"><i class="fas fa-check-circle"></i></div>
+            <div class="stat-value">@Model.TotalVerde</div>
+            <div class="stat-label">🟢 Na Validade</div>
+        </div>
+    </div>
+    <div class="col-sm-6 col-xl-3">
+        <div class="stat-card info">
+            <div class="stat-icon info"><i class="fas fa-boxes"></i></div>
+            <div class="stat-value">@Model.Total</div>
+            <div class="stat-label">Total de Produtos</div>
+        </div>
+    </div>
+</div>

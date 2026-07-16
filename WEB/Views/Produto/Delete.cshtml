@@ -8,10 +8,8 @@
     ViewData["PageTitle"] = "Confirmar Exclusão";
     ViewData["PageSubtitle"] = "Esta ação não pode ser desfeita";
 
-    var statusUpper = Model?.Status?.ToUpper() ?? "VERDE";
-    string statusClass = statusUpper == "VERMELHO" ? "badge-vermelho" : statusUpper == "AMARELO" ? "badge-amarelo" : "badge-verde";
-    string statusLabel = statusUpper == "VERMELHO" ? "Crítico" : statusUpper == "AMARELO" ? "Atenção" : "Na Validade";
-    var dias = Model != null ? (Model.DataVencimento - DateTime.Now.Date).Days : 0;
+    var diasRestantes = Model != null ? (Model.DataVencimento - DateTime.Now.Date).Days : 0;
+    string corDiasVencimento = diasRestantes <= 10 ? "var(--vermelho)" : diasRestantes <= 20 ? "var(--amarelo)" : "var(--verde)";
 }
 
 <div class="row justify-content-center">
@@ -29,21 +27,14 @@
         <div class="admin-card mb-4">
             <div class="admin-card-header">
                 <h2 class="admin-card-title"><i class="fas fa-box-open me-2" style="color:#aaa;"></i>Dados do Produto</h2>
-                <span class="@statusClass">@statusLabel</span>
+                @await Html.PartialAsync("~/Views/Shared/Componentes/_BadgeStatus.cshtml", Model?.Status)
             </div>
+
             <div class="p-4">
                 <div class="d-flex align-items-center gap-4 mb-4">
-                    @if (!string.IsNullOrEmpty(Model?.UrlImagem))
-                    {
-                        <img src="@Model.UrlImagem" alt="@Model?.Nome"
-                             style="width:70px;height:70px;object-fit:cover;border-radius:14px;border:2px solid #eee;">
-                    }
-                    else
-                    {
-                        <div style="width:70px;height:70px;border-radius:14px;background:#f0f2f6;display:flex;align-items:center;justify-content:center;">
-                            <i class="fas fa-image" style="font-size:24px;color:#ccc;"></i>
-                        </div>
-                    }
+                    @{ ViewData["Tamanho"] = "G"; }
+                    @await Html.PartialAsync("~/Views/Shared/Componentes/_ImagemProduto.cshtml", Model?.UrlImagem)
+
                     <div>
                         <div style="font-size:18px;font-weight:800;color:#1a1a2e;">@Model?.Nome</div>
                         <div style="font-size:12px;color:#aaa;margin-top:2px;">@Model?.Id</div>
@@ -78,7 +69,7 @@
                     <div class="col-4">
                         <div style="background:#f8f9fc;border-radius:10px;padding:12px;">
                             <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:#aaa;">Vencimento</div>
-                            <div style="font-size:13px;font-weight:700;color:@(dias <= 10 ? "var(--vermelho)" : dias <= 20 ? "var(--amarelo)" : "var(--verde)");margin-top:4px;">
+                            <div style="font-size:13px;font-weight:700;color:@corDiasVencimento;margin-top:4px;">
                                 @Model?.DataVencimento.ToString("dd/MM/yyyy")
                             </div>
                         </div>

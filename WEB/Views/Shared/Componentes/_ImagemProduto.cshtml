@@ -1,0 +1,40 @@
+@model string?
+
+@{
+    var tamanho = ViewData["Tamanho"]?.ToString() ?? "P";
+
+    int dimensao = tamanho switch
+    {
+        "G" => 70,
+        "M" => 56,
+        _   => 42
+    };
+
+    int raio = tamanho switch
+    {
+        "G" => 14,
+        "M" => 12,
+        _   => 10
+    };
+
+    int icone = tamanho switch
+    {
+        "G" => 24,
+        "M" => 20,
+        _   => 14
+    };
+
+    var estiloCaixa = $"width:{dimensao}px;height:{dimensao}px;border-radius:{raio}px;";
+}
+
+@if (!string.IsNullOrEmpty(Model))
+{
+    <img src="@Model" alt="Imagem do produto"
+         style="@estiloCaixa object-fit:cover; border:1.5px solid #eee;" />
+}
+else
+{
+    <div style="@estiloCaixa background:#f0f2f6; display:flex; align-items:center; justify-content:center;">
+        <i class="fas fa-image" style="color:#ccc; font-size:@(icone)px;"></i>
+    </div>
+}

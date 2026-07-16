@@ -7,17 +7,19 @@
     ViewData["ActivePage"] = "Produto";
     ViewData["PageTitle"] = "Cadastrar Produto";
     ViewData["PageSubtitle"] = "Preencha os dados para adicionar um novo produto";
+
+    ViewData["Titulo"]           = "Novo Produto";
+    ViewData["Icone"]            = "fa-plus-circle";
+    ViewData["CorIcone"]         = "var(--verde)";
+    ViewData["ControllerVoltar"] = "Produto";
+    ViewData["ActionVoltar"]     = "Index";
 }
 
 <div class="row justify-content-center">
     <div class="col-xl-8">
         <div class="admin-card">
-            <div class="admin-card-header">
-                <h2 class="admin-card-title"><i class="fas fa-plus-circle me-2" style="color:var(--verde)"></i>Novo Produto</h2>
-                <a asp-controller="Produto" asp-action="Index" class="btn-outline-custom" style="text-decoration:none; font-size:13px;">
-                    <i class="fas fa-arrow-left me-1"></i> Voltar
-                </a>
-            </div>
+
+            @await Html.PartialAsync("~/Views/Shared/Componentes/_CabecalhoFormulario.cshtml")
 
             <div class="p-4">
                 @if (!ViewData.ModelState.IsValid)
@@ -52,7 +54,6 @@
                             <span asp-validation-for="Preco" class="text-danger" style="font-size:12px;"></span>
                         </div>
 
-                 
                         <div class="col-md-6">
                             <label class="form-label-custom">Quantidade em Estoque *</label>
                             <input asp-for="Quantidade" type="number" min="0"
@@ -75,27 +76,8 @@
                             <span asp-validation-for="UrlImagem" class="text-danger" style="font-size:12px;"></span>
                         </div>
 
-                        <div class="col-12">
-                            <div style="background: linear-gradient(135deg, #e8f5e9, #f1f8e9); border-radius:12px; padding:16px; border-left:4px solid var(--verde);">
-                                <div style="font-size:12px; font-weight:700; color:var(--verde); margin-bottom:8px;">
-                                    <i class="fas fa-magic me-1"></i> Campos calculados automaticamente pela API
-                                </div>
-                                <div class="row g-2" style="font-size:12px; color:#555;">
-                                    <div class="col-sm-4">
-                                        <span style="display:inline-block;width:10px;height:10px;background:var(--vermelho);border-radius:50%;margin-right:4px;"></span>
-                                        <strong>VERMELHO</strong> ≤ 10 dias → 50% OFF
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <span style="display:inline-block;width:10px;height:10px;background:var(--amarelo);border-radius:50%;margin-right:4px;"></span>
-                                        <strong>AMARELO</strong> ≤ 20 dias → 20% OFF
-                                    </div>
-                                    <div class="col-sm-4">
-                                        <span style="display:inline-block;width:10px;height:10px;background:var(--verde);border-radius:50%;margin-right:4px;"></span>
-                                        <strong>VERDE</strong> &gt; 20 dias → sem desconto
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                        @{ ViewData["TipoAlerta"] = "Criar"; }
+                        @await Html.PartialAsync("~/Views/Shared/Componentes/_InfoCamposCalculados.cshtml")
 
                         <div class="col-12 d-flex justify-content-end gap-3 pt-2">
                             <a asp-controller="Produto" asp-action="Index" class="btn-outline-custom" style="text-decoration:none;">
@@ -105,9 +87,11 @@
                                 <i class="fas fa-save me-1"></i> Salvar Produto
                             </button>
                         </div>
+
                     </div>
                 </form>
             </div>
+
         </div>
     </div>
 </div>

@@ -1,0 +1,42 @@
+@{
+    var tipoAlerta = ViewData["TipoAlerta"]?.ToString() ?? "Criar";
+    bool ehCriacao = tipoAlerta == "Criar";
+
+    var corFundoInicio = ehCriacao ? "#e8f5e9" : "#fff8e1";
+    var corFundoFim    = ehCriacao ? "#f1f8e9" : "#fff3e0";
+    var corBorda       = ehCriacao ? "var(--verde)" : "var(--amarelo)";
+    var corTexto       = ehCriacao ? "var(--verde)" : "#e65100";
+    var iconeInfo      = ehCriacao ? "fa-magic" : "fa-sync-alt";
+    var mensagemInfo   = ehCriacao
+        ? "Campos calculados automaticamente pela API"
+        : "Status e desconto recalculados automaticamente ao salvar";
+}
+
+<div class="col-12">
+    <div style="background: linear-gradient(135deg, @corFundoInicio, @corFundoFim);
+                border-radius: 12px; padding: 16px; border-left: 4px solid @corBorda;">
+
+        <div style="font-size:12px; font-weight:700; color:@corTexto; margin-bottom:8px;">
+            <i class="fas @iconeInfo me-1"></i> @mensagemInfo
+        </div>
+
+        <div class="row g-2" style="font-size:12px; color:#555;">
+            <div class="col-sm-4">
+                <span style="display:inline-block; width:10px; height:10px;
+                             background:var(--vermelho); border-radius:50%; margin-right:4px;"></span>
+                <strong>VERMELHO</strong> ≤ 10 dias → 50% OFF
+            </div>
+            <div class="col-sm-4">
+                <span style="display:inline-block; width:10px; height:10px;
+                             background:var(--amarelo); border-radius:50%; margin-right:4px;"></span>
+                <strong>AMARELO</strong> ≤ 20 dias → 20% OFF
+            </div>
+            <div class="col-sm-4">
+                <span style="display:inline-block; width:10px; height:10px;
+                             background:var(--verde); border-radius:50%; margin-right:4px;"></span>
+                <strong>VERDE</strong> &gt; 20 dias → sem desconto
+            </div>
+        </div>
+
+    </div>
+</div>

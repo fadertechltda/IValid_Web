@@ -1,0 +1,17 @@
+@{
+    var titulo           = ViewData["Titulo"]?.ToString()           ?? "Formulário";
+    var icone            = ViewData["Icone"]?.ToString()            ?? "fa-edit";
+    var corIcone         = ViewData["CorIcone"]?.ToString()         ?? "var(--vermelho)";
+    var controllerVoltar = ViewData["ControllerVoltar"]?.ToString() ?? "Home";
+    var actionVoltar     = ViewData["ActionVoltar"]?.ToString()     ?? "Index";
+}
+
+<div class="admin-card-header">
+    <h2 class="admin-card-title">
+        <i class="fas @icone me-2" style="color:@corIcone"></i>@titulo
+    </h2>
+    <a asp-controller="@controllerVoltar" asp-action="@actionVoltar"
+       class="btn-outline-custom" style="text-decoration:none; font-size:13px;">
+        <i class="fas fa-arrow-left me-1"></i> Voltar
+    </a>
+</div>
