@@ -1,6 +1,7 @@
 using DOMAIN.Model.Produto;
 using Microsoft.AspNetCore.Mvc;
 using SERVICE.Fachada;
+using Excecoes;
 
 namespace WEB_API.Controllers
 {
@@ -18,9 +19,13 @@ namespace WEB_API.Controllers
                 await _produtoFachada.CadastrarProdutos(produto);
                 return Created();
             }
+            catch (IValidExcecao ex)
+            {
+                return BadRequest(new ExcecaoDetalhes { Codigo = ex.Codigo, InformacaoAdicional = ex.InformacaoAdicional });
+            }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ExcecaoDetalhes { Codigo = CodigoExcecao.Generico, InformacaoAdicional = ex.Message });
             }
         }
 
@@ -32,9 +37,13 @@ namespace WEB_API.Controllers
                 await _produtoFachada.AtualizarProdutos(produto);
                 return NoContent();
             }
+            catch (IValidExcecao ex)
+            {
+                return BadRequest(new ExcecaoDetalhes { Codigo = ex.Codigo, InformacaoAdicional = ex.InformacaoAdicional });
+            }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ExcecaoDetalhes { Codigo = CodigoExcecao.Generico, InformacaoAdicional = ex.Message });
             }
         }
 
@@ -45,15 +54,22 @@ namespace WEB_API.Controllers
             {
                 ProdutoModel? produto = await _produtoFachada.ListarProdutoPorId(id);
 
-                if (produto == null) return NotFound("Produto não encontrado.");
+                if (produto == null) 
+                {
+                    throw new IValidExcecao(CodigoExcecao.EntidadeNaoEncontrada, "Produto não encontrado.");
+                }
 
                 await _produtoFachada.DeletarProdutos(produto);
 
                 return Ok("Produto deletado com sucesso");
             }
+            catch (IValidExcecao ex)
+            {
+                return BadRequest(new ExcecaoDetalhes { Codigo = ex.Codigo, InformacaoAdicional = ex.InformacaoAdicional });
+            }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return BadRequest(new ExcecaoDetalhes { Codigo = CodigoExcecao.Generico, InformacaoAdicional = ex.Message });
             }
         }
 
@@ -69,10 +85,12 @@ namespace WEB_API.Controllers
         {
             ProdutoModel? produto = await _produtoFachada.ListarProdutoPorId(id);
 
-            if (produto == null) return NotFound("Produto não encontrado");
+            if (produto == null)
+            {
+                return NotFound(new ExcecaoDetalhes { Codigo = CodigoExcecao.EntidadeNaoEncontrada, InformacaoAdicional = "Produto não encontrado" });
+            }
 
             return Ok(produto);
         }
     }
 }
-

@@ -2,6 +2,7 @@ using DOMAIN.Model.Produto;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
+using Excecoes;
 
 namespace WEB.Controllers.Produto
 {
@@ -51,8 +52,8 @@ namespace WEB.Controllers.Produto
                     return RedirectToAction(nameof(Index));
                 }
 
-                var errorMsg = await response.Content.ReadAsStringAsync();
-                ModelState.AddModelError(string.Empty, $"Erro retornado pela API: {errorMsg}");
+                var erroMsg = await ExtrairMensagemErro(response);
+                ModelState.AddModelError(string.Empty, erroMsg);
             }
             catch (Exception ex)
             {
@@ -99,10 +100,8 @@ namespace WEB.Controllers.Produto
                     return RedirectToAction(nameof(Index));
                 }
 
-                var errorMsg = await response.Content.ReadAsStringAsync();
-                Console.WriteLine($"\n[ERRO PUT API] StatusCode: {response.StatusCode}");
-                Console.WriteLine($"[ERRO PUT API] ErrorMsg: {errorMsg}\n");
-                ModelState.AddModelError(string.Empty, $"Erro retornado pela API: {(string.IsNullOrEmpty(errorMsg) ? "Mensagem vazia, olhe o console" : errorMsg)}");
+                var erroMsg = await ExtrairMensagemErro(response);
+                ModelState.AddModelError(string.Empty, erroMsg);
             }
             catch (Exception ex)
             {
@@ -144,8 +143,8 @@ namespace WEB.Controllers.Produto
                 }
                 else
                 {
-                    var errorMsg = await response.Content.ReadAsStringAsync();
-                    TempData["Erro"] = $"Erro na API ao deletar: {errorMsg}";
+                    var erroMsg = await ExtrairMensagemErro(response);
+                    TempData["Erro"] = $"Erro na API ao deletar: {erroMsg}";
                 }
             }
             catch (Exception ex)
@@ -154,6 +153,20 @@ namespace WEB.Controllers.Produto
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private static async Task<string> ExtrairMensagemErro(HttpResponseMessage response)
+        {
+            var conteudo = await response.Content.ReadAsStringAsync();
+            try
+            {
+                var detalhes = JsonSerializer.Deserialize<ExcecaoDetalhes>(conteudo, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                return detalhes?.InformacaoAdicional ?? conteudo;
+            }
+            catch
+            {
+                return conteudo;
+            }
         }
     }
 }

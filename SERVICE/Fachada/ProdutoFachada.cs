@@ -1,6 +1,7 @@
 using DOMAIN.Model.Produto;
 using DOMAIN.Validador.Produto;
 using SERVICE.Processo;
+using Excecoes;
 
 namespace SERVICE.Fachada
 {
@@ -19,7 +20,7 @@ namespace SERVICE.Fachada
 
             if (!resultado.IsValid)
             {
-                throw new Exception(resultado.Errors.First().ErrorMessage);
+                throw new IValidExcecao(CodigoExcecao.SolicitarValidacao, resultado.Errors.First().ErrorMessage);
             }
 
             await _produtoProcesso.CadastrarProduto(produto);
@@ -35,7 +36,7 @@ namespace SERVICE.Fachada
 
             if (!resultado.IsValid)
             {
-                throw new Exception(resultado.Errors.First().ErrorMessage);
+                throw new IValidExcecao(CodigoExcecao.SolicitarValidacao, resultado.Errors.First().ErrorMessage);
             }
 
             await _produtoProcesso.AtualizarProduto(produto);
@@ -49,7 +50,7 @@ namespace SERVICE.Fachada
 
             if (!resultado.IsValid)
             {
-                throw new Exception(resultado.Errors.First().ErrorMessage);
+                throw new IValidExcecao(CodigoExcecao.SolicitarValidacao, resultado.Errors.First().ErrorMessage);
             }
             await _produtoProcesso.DeletarProduto(produto);
         }

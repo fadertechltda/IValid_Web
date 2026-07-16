@@ -6,9 +6,4 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\REPOSITORY\REPOSITORY.csproj" />
-    <ProjectReference Include="..\Excecoes\EXCECOES.csproj" />
-  </ItemGroup>
-
 </Project>

@@ -1,5 +1,6 @@
 <Solution>
   <Project Path="DOMAIN/DOMAIN.csproj" />
+  <Project Path="Excecoes/EXCECOES.csproj" Id="68f73b0a-a688-41ad-8ab3-feb9a8bfe5c3" />
   <Project Path="REPOSITORY/REPOSITORY.csproj" />
   <Project Path="SERVICE/SERVICE.csproj" />
   <Project Path="WEB/WEB.csproj" />
