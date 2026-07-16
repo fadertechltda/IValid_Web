@@ -429,9 +429,13 @@
         </nav>
 
         <div class="sidebar-footer">
-            <div class="user-avatar">A</div>
+            <div class="user-avatar">
+                @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "A")
+            </div>
             <div>
-                <div class="user-name">Administrador</div>
+                <div class="user-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">
+                    @(User.Identity?.Name ?? "Administrador")
+                </div>
                 <div class="user-role">Super Admin</div>
             </div>
         </div>
@@ -450,7 +454,15 @@
                 <i class="fas fa-bell"></i>
                 <span class="notif-dot"></span>
             </button>
-            <div class="user-avatar">A</div>
+            <div class="user-avatar">
+                @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "A")
+            </div>
+            
+            <form asp-controller="Autenticacao" asp-action="Logout" method="post" style="margin: 0; padding: 0;">
+                <button type="submit" class="topbar-icon-btn" title="Sair do Sistema" style="color: var(--vermelho);">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </form>
         </div>
     </header>
 

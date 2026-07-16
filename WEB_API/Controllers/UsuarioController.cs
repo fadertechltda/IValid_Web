@@ -26,30 +26,27 @@ namespace WEB_API.Controllers
 
                 if (string.IsNullOrEmpty(_firebaseApiKey))
                 {
-                    UsuarioModel usuario = await _usuarioFachada.AutenticarAdministrador(login.Email);
-                    return Ok(usuario);
+                    throw new IValidExcecao(CodigoExcecao.Generico, "A 'ApiKey' do Firebase não está configurada no appsettings.json da API. A validação de senha é impossível.");
                 }
-                else
+
+                using var clienteHttp = new HttpClient();
+                var corpoRequisicao = new
                 {
-                    using var clienteHttp = new HttpClient();
-                    var corpoRequisicao = new
-                    {
-                        email = login.Email,
-                        password = login.Senha,
-                        returnSecureToken = true
-                    };
+                    email = login.Email,
+                    password = login.Senha,
+                    returnSecureToken = true
+                };
 
-                    var conteudo = new StringContent(JsonSerializer.Serialize(corpoRequisicao), Encoding.UTF8, "application/json");
-                    var resposta = await clienteHttp.PostAsync($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={_firebaseApiKey}", conteudo);
+                var conteudo = new StringContent(JsonSerializer.Serialize(corpoRequisicao), Encoding.UTF8, "application/json");
+                var resposta = await clienteHttp.PostAsync($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={_firebaseApiKey}", conteudo);
 
-                    if (!resposta.IsSuccessStatusCode)
-                    {
-                        throw new IValidExcecao(CodigoExcecao.ValidacaoSeguranca, "Email ou senha inválidos.");
-                    }
-
-                    UsuarioModel usuario = await _usuarioFachada.AutenticarAdministrador(login.Email);
-                    return Ok(usuario);
+                if (!resposta.IsSuccessStatusCode)
+                {
+                    throw new IValidExcecao(CodigoExcecao.ValidacaoSeguranca, "Email ou senha inválidos.");
                 }
+
+                UsuarioModel usuario = await _usuarioFachada.AutenticarAdministrador(login.Email);
+                return Ok(usuario);
             }
             catch (IValidExcecao ex)
             {
@@ -73,30 +70,27 @@ namespace WEB_API.Controllers
 
                 if (string.IsNullOrEmpty(_firebaseApiKey))
                 {
-                    await _usuarioFachada.CriarAdministrador(registro);
-                    return Ok();
+                    throw new IValidExcecao(CodigoExcecao.Generico, "A 'ApiKey' do Firebase não está configurada no appsettings.json da API. A criação do usuário não pode ser feita.");
                 }
-                else
+
+                using var clienteHttp = new HttpClient();
+                var corpoRequisicao = new
                 {
-                    using var clienteHttp = new HttpClient();
-                    var corpoRequisicao = new
-                    {
-                        email = registro.Email,
-                        password = registro.Senha,
-                        returnSecureToken = true
-                    };
+                    email = registro.Email,
+                    password = registro.Senha,
+                    returnSecureToken = true
+                };
 
-                    var conteudo = new StringContent(JsonSerializer.Serialize(corpoRequisicao), Encoding.UTF8, "application/json");
-                    var resposta = await clienteHttp.PostAsync($"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={_firebaseApiKey}", conteudo);
+                var conteudo = new StringContent(JsonSerializer.Serialize(corpoRequisicao), Encoding.UTF8, "application/json");
+                var resposta = await clienteHttp.PostAsync($"https://identitytoolkit.googleapis.com/v1/accounts:signUp?key={_firebaseApiKey}", conteudo);
 
-                    if (!resposta.IsSuccessStatusCode)
-                    {
-                        throw new IValidExcecao(CodigoExcecao.ValidacaoSeguranca, "Não foi possível criar o usuário no Firebase Auth.");
-                    }
-
-                    await _usuarioFachada.CriarAdministrador(registro);
-                    return Ok();
+                if (!resposta.IsSuccessStatusCode)
+                {
+                    throw new IValidExcecao(CodigoExcecao.ValidacaoSeguranca, "Não foi possível criar o usuário no Firebase Auth.");
                 }
+
+                await _usuarioFachada.CriarAdministrador(registro);
+                return Ok();
             }
             catch (IValidExcecao ex)
             {
