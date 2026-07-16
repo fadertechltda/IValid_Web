@@ -9,9 +9,10 @@ namespace WEB_API.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsuarioController(UsuarioFachada usuarioFachada, IConfiguration configuration) : ControllerBase
+    public class UsuarioController(UsuarioFachada usuarioFachada, IConfiguration configuration, IHttpClientFactory httpClientFactory) : ControllerBase
     {
         private readonly UsuarioFachada _usuarioFachada = usuarioFachada;
+        private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly string? _firebaseApiKey = configuration["Firebase:ApiKey"];
 
         [HttpPost("login")]
@@ -29,7 +30,7 @@ namespace WEB_API.Controllers
                     throw new IValidExcecao(CodigoExcecao.Generico, "A 'ApiKey' do Firebase não está configurada no appsettings.json da API. A validação de senha é impossível.");
                 }
 
-                using var clienteHttp = new HttpClient();
+                using var clienteHttp = _httpClientFactory.CreateClient();
                 var corpoRequisicao = new
                 {
                     email = login.Email,
@@ -73,7 +74,7 @@ namespace WEB_API.Controllers
                     throw new IValidExcecao(CodigoExcecao.Generico, "A 'ApiKey' do Firebase não está configurada no appsettings.json da API. A criação do usuário não pode ser feita.");
                 }
 
-                using var clienteHttp = new HttpClient();
+                using var clienteHttp = _httpClientFactory.CreateClient();
                 var corpoRequisicao = new
                 {
                     email = registro.Email,
