@@ -18,5 +18,8 @@ namespace DOMAIN.Model.Usuario
         [Required(ErrorMessage = "A confirmação de senha é obrigatória.")]
         [Compare("Senha", ErrorMessage = "As senhas não coincidem.")]
         public string? ConfirmarSenha { get; set; }
+
+        [Required(ErrorMessage = "O código de convite de administrador é obrigatório.")]
+        public string? CodigoConvite { get; set; }
     }
 }

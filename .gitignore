@@ -368,3 +368,10 @@ Chave/
 
 # Chave do Firebase
 firebase-key.json
+
+# Segurança: appsettings.Development.json guarda segredos locais
+# (ApiKeyInterna, CodigoConviteAdmin) que não devem ir para o repositório.
+# Em produção, use variáveis de ambiente ou um cofre de segredos (ex: Azure Key Vault),
+# nunca o appsettings.json versionado.
+**/appsettings.Development.json
+**/appsettings.Local.json

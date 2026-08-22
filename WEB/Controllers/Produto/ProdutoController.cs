@@ -9,9 +9,10 @@ using Microsoft.AspNetCore.Authorization;
 namespace WEB.Controllers.Produto
 {
     [Authorize]
-    public class ProdutoController(IHttpClientFactory httpClientFactory) : Controller
+    public class ProdutoController(IHttpClientFactory httpClientFactory, ILogger<ProdutoController> logger) : Controller
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("IValidApi");
+        private readonly ILogger<ProdutoController> _logger = logger;
         private readonly string _apiUrl = "api/Produto";
 
         public async Task<IActionResult> Index()
@@ -60,7 +61,8 @@ namespace WEB.Controllers.Produto
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, $"Erro de conexão: {ex.Message}");
+                _logger.LogError(ex, "Erro de conexão com a API ao criar produto");
+                ModelState.AddModelError(string.Empty, "Não foi possível conectar ao servidor. Tente novamente em instantes.");
             }
 
             return View(produto);
@@ -108,7 +110,8 @@ namespace WEB.Controllers.Produto
             }
             catch (Exception ex)
             {
-                ModelState.AddModelError(string.Empty, $"Erro de conexão: {ex.Message}");
+                _logger.LogError(ex, "Erro de conexão com a API ao editar produto {Id}", id);
+                ModelState.AddModelError(string.Empty, "Não foi possível conectar ao servidor. Tente novamente em instantes.");
             }
 
             return View(produto);
@@ -152,7 +155,8 @@ namespace WEB.Controllers.Produto
             }
             catch (Exception ex)
             {
-                TempData["Erro"] = $"Erro de conexão: {ex.Message}";
+                _logger.LogError(ex, "Erro de conexão com a API ao deletar produto {Id}", id);
+                TempData["Erro"] = "Não foi possível conectar ao servidor. Tente novamente em instantes.";
             }
 
             return RedirectToAction(nameof(Index));

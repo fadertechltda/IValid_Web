@@ -1,11 +1,27 @@
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc.Authorization;
+
 var builder = WebApplication.CreateBuilder(args);
+
+var apiKeyInterna = builder.Configuration["Seguranca:ApiKeyInterna"];
 
 builder.Services.AddHttpClient("IValidApi", client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiSettings:BaseUrl"] ?? "https://localhost:7183/");
+    if (!string.IsNullOrEmpty(apiKeyInterna))
+    {
+        client.DefaultRequestHeaders.Add("X-Internal-Api-Key", apiKeyInterna);
+    }
 });
 
-builder.Services.AddControllersWithViews()
+builder.Services.AddControllersWithViews(options =>
+    {
+        var politicaPadrao = new AuthorizationPolicyBuilder()
+            .RequireAuthenticatedUser()
+            .Build();
+        options.Filters.Add(new AuthorizeFilter(politicaPadrao));
+    })
     .AddMvcOptions(options =>
     {
         options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((valor, _) => $"O valor '{valor}' é inválido.");
@@ -22,6 +38,11 @@ builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.C
         options.AccessDeniedPath = "/Autenticacao/Login";
         options.ExpireTimeSpan = TimeSpan.FromHours(8);
         options.SlidingExpiration = true;
+
+        
+        options.Cookie.HttpOnly = true;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
+        options.Cookie.SameSite = SameSiteMode.Strict;
     });
 
 var app = builder.Build();

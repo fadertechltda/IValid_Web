@@ -12,7 +12,8 @@ var projectId = builder.Configuration["Firebase:ProjectId"];
 
 if (!string.IsNullOrEmpty(firebasePath))
 {
-    Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", firebasePath);
+    var caminhoAbsoluto = Path.GetFullPath(firebasePath, builder.Environment.ContentRootPath);
+    Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", caminhoAbsoluto);
 }
 
 builder.Services.AddSingleton(_ => FirestoreDb.Create(projectId));
@@ -36,11 +37,41 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi(); 
+    app.MapOpenApi();
 
     app.MapScalarApiReference();
 }
 
+app.UseHttpsRedirection();
+
+var apiKeyInterna = builder.Configuration["Seguranca:ApiKeyInterna"];
+
+app.Use(async (context, next) =>
+{
+    var caminho = context.Request.Path.Value ?? string.Empty;
+    var ehRotaDeDocumentacao = caminho.StartsWith("/openapi", StringComparison.OrdinalIgnoreCase)
+                             || caminho.StartsWith("/scalar", StringComparison.OrdinalIgnoreCase);
+
+    if (!ehRotaDeDocumentacao)
+    {
+        if (string.IsNullOrEmpty(apiKeyInterna))
+        {
+            context.Response.StatusCode = StatusCodes.Status500InternalServerError;
+            await context.Response.WriteAsync("A API não está configurada corretamente (chave interna ausente). Configure 'Seguranca:ApiKeyInterna'.");
+            return;
+        }
+
+        if (!context.Request.Headers.TryGetValue("X-Internal-Api-Key", out var chaveRecebida) ||
+            chaveRecebida != apiKeyInterna)
+        {
+            context.Response.StatusCode = StatusCodes.Status401Unauthorized;
+            await context.Response.WriteAsync("Acesso negado: esta API é de uso interno.");
+            return;
+        }
+    }
+
+    await next();
+});
 
 app.UseAuthorization();
 app.MapControllers();

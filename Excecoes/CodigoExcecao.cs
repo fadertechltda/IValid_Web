@@ -6,6 +6,7 @@ namespace Excecoes
         ValidacaoSeguranca,
         SolicitarValidacao,
         Concorrencia,
-        EntidadeNaoEncontrada
+        EntidadeNaoEncontrada,
+        NaoAutorizado
     }
 }
