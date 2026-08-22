@@ -40,7 +40,7 @@
             display: flex;
             flex-direction: column;
             transition: all 0.3s ease;
-            box-shadow: 4px 0 20px rgba(0,0,0,0.3);
+            border-right: 1px solid rgba(255,255,255,0.06);
         }
 
         .sidebar-brand {
@@ -52,16 +52,15 @@
         }
 
         .brand-logo {
-            width: 40px; height: 40px;
-            border-radius: 10px;
-            background: linear-gradient(135deg, var(--vermelho) 0%, var(--amarelo) 50%, var(--verde) 100%);
+            width: 36px; height: 36px;
+            border-radius: 8px;
+            background: var(--vermelho);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
-            font-size: 18px;
+            font-weight: 700;
+            font-size: 16px;
             color: white;
-            box-shadow: 0 4px 12px rgba(229,57,53,0.4);
         }
 
         .brand-text { color: white; font-weight: 700; font-size: 20px; letter-spacing: 1px; }
@@ -132,7 +131,7 @@
 
         .user-avatar {
             width: 36px; height: 36px;
-            background: linear-gradient(135deg, var(--vermelho), var(--amarelo));
+            background: var(--vermelho);
             border-radius: 50%;
             display: flex;
             align-items: center;
@@ -157,7 +156,6 @@
             align-items: center;
             justify-content: space-between;
             padding: 0 28px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
             border-bottom: 1px solid #eef0f4;
         }
 
@@ -168,7 +166,7 @@
 
         .topbar-icon-btn {
             width: 38px; height: 38px;
-            border-radius: 10px;
+            border-radius: 6px;
             background: var(--bg-page);
             border: none;
             display: flex;
@@ -192,8 +190,7 @@
 
         .admin-card {
             background: white;
-            border-radius: 16px;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            border-radius: 8px;
             border: 1px solid #eef0f4;
             overflow: hidden;
         }
@@ -210,51 +207,30 @@
 
         .stat-card {
             background: white;
-            border-radius: 16px;
-            padding: 22px;
-            box-shadow: 0 2px 16px rgba(0,0,0,0.06);
+            border-radius: 8px;
+            padding: 18px 20px;
             border: 1px solid #eef0f4;
+            border-left: 3px solid transparent;
             position: relative;
-            overflow: hidden;
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
         }
 
-        .stat-card:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.1); }
+        .stat-card.danger    { border-left-color: var(--vermelho); }
+        .stat-card.warning   { border-left-color: var(--amarelo); }
+        .stat-card.success   { border-left-color: var(--verde); }
+        .stat-card.info      { border-left-color: #1565C0; }
+        .stat-card.secondary { border-left-color: var(--cinza); }
+        .stat-card.esgotado  { border-left-color: var(--azul); }
 
-        .stat-card::before {
-            content: '';
-            position: absolute;
-            top: 0; left: 0; right: 0;
-            height: 4px;
-        }
-
-        .stat-card.danger::before { background: linear-gradient(90deg, var(--vermelho), #ff5252); }
-        .stat-card.warning::before { background: linear-gradient(90deg, var(--amarelo), #ffd740); }
-        .stat-card.success::before { background: linear-gradient(90deg, var(--verde), #4CAF50); }
-        .stat-card.info::before { background: linear-gradient(90deg, #1565C0, #42a5f5); }
-        .stat-card.secondary::before { background: linear-gradient(90deg, var(--cinza), #9e9e9e); }
-        .stat-card.esgotado::before { background: linear-gradient(90deg, var(--azul), #64b5f6); }
-
-        .stat-icon {
-            width: 48px; height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            margin-bottom: 14px;
-        }
-
-        .stat-icon.danger { background: var(--vermelho-light); color: var(--vermelho); }
-        .stat-icon.warning { background: var(--amarelo-light); color: var(--amarelo); }
-        .stat-icon.success { background: var(--verde-light); color: var(--verde); }
-        .stat-icon.info { background: #e3f2fd; color: #1565C0; }
-        .stat-icon.secondary { background: var(--cinza-light); color: var(--cinza); }
-        .stat-icon.esgotado { background: var(--azul-light); color: var(--azul); }
+        .stat-card.danger .stat-label i    { color: var(--vermelho); }
+        .stat-card.warning .stat-label i   { color: var(--amarelo); }
+        .stat-card.success .stat-label i   { color: var(--verde); }
+        .stat-card.info .stat-label i      { color: #1565C0; }
+        .stat-card.secondary .stat-label i { color: var(--cinza); }
+        .stat-card.esgotado .stat-label i  { color: var(--azul); }
 
         .filtro-status {
             border: 1.5px solid #e8eaef;
-            border-radius: 10px;
+            border-radius: 6px;
             background: white;
             color: #555;
             font-size: 13px;
@@ -266,8 +242,8 @@
         .filtro-status:hover { background: #f4f6fb; }
         .filtro-status.active { background: var(--sidebar-bg); color: white; border-color: var(--sidebar-bg); }
 
-        .stat-value { font-size: 28px; font-weight: 800; color: #1a1a2e; line-height: 1; }
-        .stat-label { font-size: 12px; font-weight: 500; color: var(--text-muted-custom); margin-top: 4px; }
+        .stat-value { font-size: 24px; font-weight: 700; color: #1a1a2e; line-height: 1; }
+        .stat-label { font-size: 12px; font-weight: 500; color: var(--text-muted-custom); margin-bottom: 8px; display: flex; align-items: center; gap: 6px; }
 
         .badge-vermelho { background: var(--vermelho-light); color: var(--vermelho); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
         .badge-amarelo  { background: var(--amarelo-light); color: #e65100; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
@@ -307,47 +283,47 @@
             background: var(--vermelho);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 6px;
             font-weight: 600;
             padding: 9px 20px;
             font-size: 13px;
-            transition: all 0.2s;
+            transition: background 0.15s;
         }
-        .btn-danger-custom:hover { background: var(--vermelho-dark); color: white; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(229,57,53,0.4); }
+        .btn-danger-custom:hover { background: var(--vermelho-dark); color: white; }
 
         .btn-warning-custom {
             background: var(--amarelo);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 6px;
             font-weight: 600;
             padding: 9px 20px;
             font-size: 13px;
-            transition: all 0.2s;
+            transition: background 0.15s;
         }
-        .btn-warning-custom:hover { background: #e65100; color: white; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(249,168,37,0.4); }
+        .btn-warning-custom:hover { background: #e65100; color: white; }
 
         .btn-success-custom {
             background: var(--verde);
             color: white;
             border: none;
-            border-radius: 10px;
+            border-radius: 6px;
             font-weight: 600;
             padding: 9px 20px;
             font-size: 13px;
-            transition: all 0.2s;
+            transition: background 0.15s;
         }
-        .btn-success-custom:hover { background: #1B5E20; color: white; transform: translateY(-1px); box-shadow: 0 4px 14px rgba(46,125,50,0.4); }
+        .btn-success-custom:hover { background: #1B5E20; color: white; }
 
         .btn-outline-custom {
             background: transparent;
             color: #555;
             border: 1px solid #e0e0e0;
-            border-radius: 10px;
+            border-radius: 6px;
             font-weight: 600;
             padding: 9px 20px;
             font-size: 13px;
-            transition: all 0.2s;
+            transition: background 0.15s;
         }
         .btn-outline-custom:hover { background: #f4f6fb; border-color: #bbb; }
 
@@ -372,7 +348,7 @@
         .form-label-custom { font-size: 12px; font-weight: 600; color: #555; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
         .form-control-custom {
             border: 1.5px solid #e8eaef;
-            border-radius: 10px;
+            border-radius: 6px;
             font-size: 14px;
             padding: 10px 14px;
             transition: all 0.2s;
@@ -381,7 +357,7 @@
         .form-control-custom:focus { border-color: var(--vermelho); box-shadow: 0 0 0 3px rgba(229,57,53,0.12); outline: none; }
 
         .alert-admin {
-            border-radius: 12px;
+            border-radius: 6px;
             border: none;
             font-size: 13px;
             font-weight: 500;

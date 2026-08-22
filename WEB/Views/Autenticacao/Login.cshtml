@@ -39,8 +39,8 @@
             width: 100%;
             max-width: 1000px;
             background: white;
-            border-radius: 24px;
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.08);
+            border-radius: 10px;
+            border: 1px solid #eef0f4;
             display: flex;
             overflow: hidden;
             margin: 20px;
@@ -48,7 +48,7 @@
 
         .login-image-section {
             flex: 1.2;
-            background: linear-gradient(135deg, var(--sidebar-bg) 0%, #0a0a16 100%);
+            background: var(--sidebar-bg);
             padding: 60px 50px;
             display: flex;
             flex-direction: column;
@@ -57,30 +57,17 @@
             position: relative;
         }
 
-        .login-image-section::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(229,57,53,0.15) 0%, transparent 60%);
-            z-index: 1;
-            pointer-events: none;
-        }
-
         .brand-logo-large {
-            width: 64px;
-            height: 64px;
-            border-radius: 16px;
-            background: linear-gradient(135deg, var(--vermelho) 0%, var(--amarelo) 50%, var(--verde) 100%);
+            width: 56px;
+            height: 56px;
+            border-radius: 10px;
+            background: var(--vermelho);
             display: flex;
             align-items: center;
             justify-content: center;
-            font-weight: 800;
-            font-size: 32px;
+            font-weight: 700;
+            font-size: 26px;
             color: white;
-            box-shadow: 0 8px 24px rgba(229,57,53,0.4);
             margin-bottom: 30px;
             position: relative;
             z-index: 2;
@@ -142,7 +129,7 @@
 
         .form-control-custom {
             border: 1.5px solid #e8eaef;
-            border-radius: 12px;
+            border-radius: 6px;
             font-size: 15px;
             padding: 12px 16px;
             transition: all 0.2s;
@@ -162,24 +149,21 @@
             background: var(--vermelho);
             color: white;
             border: none;
-            border-radius: 12px;
+            border-radius: 6px;
             font-weight: 600;
             padding: 14px;
             font-size: 15px;
             width: 100%;
-            transition: all 0.3s;
+            transition: background 0.15s;
             margin-top: 10px;
-            box-shadow: 0 4px 14px rgba(229,57,53,0.3);
         }
 
         .btn-login:hover {
             background: var(--vermelho-dark);
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(229,57,53,0.4);
         }
 
         .alert-custom {
-            border-radius: 12px;
+            border-radius: 6px;
             border: none;
             font-size: 14px;
             font-weight: 500;
@@ -193,7 +177,7 @@
         }
 
         .alert-sucesso {
-            border-radius: 12px;
+            border-radius: 6px;
             border: none;
             font-size: 14px;
             font-weight: 500;
