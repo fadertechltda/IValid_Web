@@ -32,6 +32,7 @@
         <button type="button" class="filtro-status" data-filtro-status="VERMELHO" onclick="filtrarPorStatus('VERMELHO', this)">🔴 Críticos</button>
         <button type="button" class="filtro-status" data-filtro-status="AMARELO" onclick="filtrarPorStatus('AMARELO', this)">🟡 Em Atenção</button>
         <button type="button" class="filtro-status" data-filtro-status="VERDE" onclick="filtrarPorStatus('VERDE', this)">🟢 Na Validade</button>
+        <button type="button" class="filtro-status" data-filtro-status="ESGOTADO" onclick="filtrarPorStatus('ESGOTADO', this)">📦 Sem Estoque</button>
     </div>
 
     <div class="table-responsive">
@@ -74,7 +75,8 @@
                             _ => "var(--verde)"
                         };
 
-                        <tr data-status="@statusUpper" class="@(vencido ? "opacity-75" : "")">
+                        <tr data-status="@statusUpper" data-esgotado="@produto.Esgotado.ToString().ToLower()"
+                            class="@(vencido || produto.Esgotado ? "opacity-75" : "")">
                             <td>
                                 <div class="d-flex align-items-center gap-3">
                                     @{ ViewData["Tamanho"] = "P"; }
@@ -152,8 +154,10 @@
         document.querySelectorAll('#tabelaProdutos tbody tr').forEach(linha => {
             const textoLinha = removerAcentos(linha.textContent.toLowerCase());
             const statusLinha = linha.getAttribute('data-status');
+            const esgotadoLinha = linha.getAttribute('data-esgotado') === 'true';
             const passaBusca = textoLinha.includes(termoBusca);
-            const passaStatus = statusAtivo === 'TODOS' || statusLinha === statusAtivo;
+            const passaStatus = statusAtivo === 'TODOS'
+                || (statusAtivo === 'ESGOTADO' ? esgotadoLinha : statusLinha === statusAtivo);
             linha.style.display = (passaBusca && passaStatus) ? '' : 'none';
         });
     }

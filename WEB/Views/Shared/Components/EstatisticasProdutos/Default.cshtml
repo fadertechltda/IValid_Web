@@ -1,7 +1,7 @@
 @using WEB.ComponentesVisuais
 @model ResumoEstatisticas
 
-<div class="row row-cols-2 row-cols-xl-5 g-3 mb-4">
+<div class="row row-cols-2 row-cols-xl-6 g-3 mb-4">
     <div class="col">
         <div class="stat-card secondary">
             <div class="stat-icon secondary"><i class="fas fa-skull-crossbones"></i></div>
@@ -28,6 +28,13 @@
             <div class="stat-icon success"><i class="fas fa-check-circle"></i></div>
             <div class="stat-value">@Model.TotalVerde</div>
             <div class="stat-label">🟢 Na Validade</div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="stat-card esgotado">
+            <div class="stat-icon esgotado"><i class="fas fa-dolly"></i></div>
+            <div class="stat-value">@Model.TotalEsgotado</div>
+            <div class="stat-label">📦 Sem Estoque</div>
         </div>
     </div>
     <div class="col">

@@ -15,6 +15,7 @@ namespace WEB.ComponentesVisuais
                 TotalAmarelo  = lista.Count(p => p.Status?.ToUpper() == "AMARELO"),
                 TotalVerde    = lista.Count(p => p.Status?.ToUpper() == "VERDE"),
                 TotalVencido  = lista.Count(p => p.Status?.ToUpper() == "VENCIDO"),
+                TotalEsgotado = lista.Count(p => p.Esgotado),
                 Total         = lista.Count
             };
 
@@ -28,6 +29,7 @@ namespace WEB.ComponentesVisuais
         public int TotalAmarelo  { get; set; }
         public int TotalVerde    { get; set; }
         public int TotalVencido  { get; set; }
+        public int TotalEsgotado { get; set; }
         public int Total         { get; set; }
     }
 }

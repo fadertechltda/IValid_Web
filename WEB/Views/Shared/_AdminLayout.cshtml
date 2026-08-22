@@ -18,6 +18,8 @@
             --verde-light: #E8F5E9;
             --cinza: #616161;
             --cinza-light: #EEEEEE;
+            --azul: #1565C0;
+            --azul-light: #E3F2FD;
             --sidebar-bg: #1a1a2e;
             --sidebar-width: 260px;
             --topbar-height: 64px;
@@ -231,6 +233,7 @@
         .stat-card.success::before { background: linear-gradient(90deg, var(--verde), #4CAF50); }
         .stat-card.info::before { background: linear-gradient(90deg, #1565C0, #42a5f5); }
         .stat-card.secondary::before { background: linear-gradient(90deg, var(--cinza), #9e9e9e); }
+        .stat-card.esgotado::before { background: linear-gradient(90deg, var(--azul), #64b5f6); }
 
         .stat-icon {
             width: 48px; height: 48px;
@@ -247,6 +250,7 @@
         .stat-icon.success { background: var(--verde-light); color: var(--verde); }
         .stat-icon.info { background: #e3f2fd; color: #1565C0; }
         .stat-icon.secondary { background: var(--cinza-light); color: var(--cinza); }
+        .stat-icon.esgotado { background: var(--azul-light); color: var(--azul); }
 
         .filtro-status {
             border: 1.5px solid #e8eaef;
@@ -269,11 +273,13 @@
         .badge-amarelo  { background: var(--amarelo-light); color: #e65100; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
         .badge-verde    { background: var(--verde-light); color: var(--verde); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
         .badge-vencido  { background: var(--cinza-light); color: var(--cinza); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
+        .badge-esgotado { background: var(--azul-light); color: var(--azul); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
 
         .badge-vermelho::before { content: ''; width: 6px; height: 6px; background: var(--vermelho); border-radius: 50%; }
         .badge-amarelo::before  { content: ''; width: 6px; height: 6px; background: var(--amarelo); border-radius: 50%; }
         .badge-verde::before    { content: ''; width: 6px; height: 6px; background: var(--verde); border-radius: 50%; }
         .badge-vencido::before  { content: ''; width: 6px; height: 6px; background: var(--cinza); border-radius: 50%; }
+        .badge-esgotado::before { content: ''; width: 6px; height: 6px; background: var(--azul); border-radius: 50%; }
 
         .admin-table thead th {
             font-size: 11px;
@@ -387,6 +393,14 @@
         .alert-admin.success { background: var(--verde-light); color: var(--verde); }
         .alert-admin.danger  { background: var(--vermelho-light); color: var(--vermelho); }
 
+        .alert-auto-dismiss {
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .alert-auto-dismiss.alert-hide {
+            opacity: 0;
+            transform: translateY(-8px);
+        }
+
         @@media (max-width: 992px) {
             #sidebar { transform: translateX(-100%); }
             #sidebar.show { transform: translateX(0); }
@@ -458,13 +472,13 @@
         <div class="page-wrapper">
             @if (TempData["Sucesso"] != null)
             {
-                <div class="alert-admin success mb-4">
+                <div class="alert-admin success mb-4 alert-auto-dismiss">
                     <i class="fas fa-check-circle"></i> @TempData["Sucesso"]
                 </div>
             }
             @if (TempData["Erro"] != null)
             {
-                <div class="alert-admin danger mb-4">
+                <div class="alert-admin danger mb-4 alert-auto-dismiss">
                     <i class="fas fa-exclamation-circle"></i> @TempData["Erro"]
                 </div>
             }
@@ -476,6 +490,16 @@
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/js/all.min.js"></script>
+    <script>
+        document.querySelectorAll('.alert-auto-dismiss').forEach(function (alerta) {
+            setTimeout(function () {
+                alerta.classList.add('alert-hide');
+                setTimeout(function () {
+                    alerta.remove();
+                }, 500);
+            }, 4000);
+        });
+    </script>
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>

@@ -35,6 +35,8 @@ namespace DOMAIN.Model.Produto
         [FirestoreProperty("urlImagem")]
         public string? UrlImagem { get; set; }
 
+        public bool Esgotado => Quantidade <= 0;
+
         public ProdutoModel()
         {
 
