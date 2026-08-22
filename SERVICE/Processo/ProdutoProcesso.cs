@@ -37,7 +37,9 @@ namespace SERVICE.Processo
                 AplicarRegras(produto, configuracao);
             }
 
-            return listaDeProdutos;
+            return [.. listaDeProdutos
+                .OrderBy(p => PrioridadeStatus(p.Status))
+                .ThenBy(p => p.DataVencimento)];
         }
 
         public async Task<ProdutoModel?> ListarProdutoPorId(string id)
@@ -93,5 +95,14 @@ namespace SERVICE.Processo
         {
             return preco * (1 - percentualDesconto / 100.0);
         }
+
+        private static int PrioridadeStatus(string? status) => status?.ToUpper() switch
+        {
+            "VERMELHO" => 0,
+            "AMARELO" => 1,
+            "VERDE" => 2,
+            "VENCIDO" => 3,
+            _ => 4
+        };
     }
 }
