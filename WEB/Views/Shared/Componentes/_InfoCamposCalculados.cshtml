@@ -1,6 +1,9 @@
+@using DOMAIN.Model.Configuracao
 @{
     var tipoAlerta = ViewData["TipoAlerta"]?.ToString() ?? "Criar";
     bool ehCriacao = tipoAlerta == "Criar";
+
+    var configuracao = ViewData["Configuracao"] as ConfiguracaoModel ?? new ConfiguracaoModel();
 
     var corFundoInicio = ehCriacao ? "#e8f5e9" : "#fff8e1";
     var corFundoFim    = ehCriacao ? "#f1f8e9" : "#fff3e0";
@@ -8,8 +11,8 @@
     var corTexto       = ehCriacao ? "var(--verde)" : "#e65100";
     var iconeInfo      = ehCriacao ? "fa-magic" : "fa-sync-alt";
     var mensagemInfo   = ehCriacao
-        ? "Campos calculados automaticamente pela API"
-        : "Status e desconto recalculados automaticamente ao salvar";
+        ? "Esses campos são preenchidos automaticamente pelo sistema"
+        : "Status e desconto são atualizados automaticamente ao salvar";
 }
 
 <div class="col-12">
@@ -24,18 +27,22 @@
             <div class="col-sm-4">
                 <span style="display:inline-block; width:10px; height:10px;
                              background:var(--vermelho); border-radius:50%; margin-right:4px;"></span>
-                <strong>VERMELHO</strong> ≤ 10 dias → 50% OFF
+                <strong>Crítico</strong> ≤ @configuracao.DiasAlertaVermelho dias → @configuracao.PercentualDescontoVermelho% OFF
             </div>
             <div class="col-sm-4">
                 <span style="display:inline-block; width:10px; height:10px;
                              background:var(--amarelo); border-radius:50%; margin-right:4px;"></span>
-                <strong>AMARELO</strong> ≤ 20 dias → 20% OFF
+                <strong>Em Atenção</strong> ≤ @configuracao.DiasAlertaAmarelo dias → @configuracao.PercentualDescontoAmarelo% OFF
             </div>
             <div class="col-sm-4">
                 <span style="display:inline-block; width:10px; height:10px;
                              background:var(--verde); border-radius:50%; margin-right:4px;"></span>
-                <strong>VERDE</strong> &gt; 20 dias → sem desconto
+                <strong>Na Validade</strong> &gt; @configuracao.DiasAlertaAmarelo dias → sem desconto
             </div>
+        </div>
+
+        <div style="font-size:11px; color:#999; margin-top:8px;">
+            Esses valores podem ser ajustados em Configurações → Regras de validade e desconto.
         </div>
 
     </div>

@@ -1,4 +1,5 @@
 using DOMAIN.Model.Produto;
+using DOMAIN.Model.Configuracao;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
@@ -14,6 +15,7 @@ namespace WEB.Controllers.Produto
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("IValidApi");
         private readonly ILogger<ProdutoController> _logger = logger;
         private readonly string _apiUrl = "api/Produto";
+        private readonly string _apiUrlConfiguracao = "api/Configuracao";
 
         public async Task<IActionResult> Index()
         {
@@ -34,8 +36,9 @@ namespace WEB.Controllers.Produto
             return View(produtos);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewData["Configuracao"] = await ObterConfiguracao();
             return View();
         }
 
@@ -65,6 +68,7 @@ namespace WEB.Controllers.Produto
                 ModelState.AddModelError(string.Empty, "Não foi possível conectar ao servidor. Tente novamente em instantes.");
             }
 
+            ViewData["Configuracao"] = await ObterConfiguracao();
             return View(produto);
         }
 
@@ -83,6 +87,7 @@ namespace WEB.Controllers.Produto
             var jsonString = await response.Content.ReadAsStringAsync();
             var produto = JsonSerializer.Deserialize<ProdutoModel>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
+            ViewData["Configuracao"] = await ObterConfiguracao();
             return View(produto);
         }
 
@@ -114,6 +119,7 @@ namespace WEB.Controllers.Produto
                 ModelState.AddModelError(string.Empty, "Não foi possível conectar ao servidor. Tente novamente em instantes.");
             }
 
+            ViewData["Configuracao"] = await ObterConfiguracao();
             return View(produto);
         }
 
@@ -160,6 +166,27 @@ namespace WEB.Controllers.Produto
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<ConfiguracaoModel> ObterConfiguracao()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync(_apiUrlConfiguracao);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonString = await response.Content.ReadAsStringAsync();
+                    var configuracao = JsonSerializer.Deserialize<ConfiguracaoModel>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    return configuracao ?? new ConfiguracaoModel();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro de conexão com a API ao buscar configurações");
+            }
+
+            return new ConfiguracaoModel();
         }
 
         private static async Task<string> ExtrairMensagemErro(HttpResponseMessage response)
