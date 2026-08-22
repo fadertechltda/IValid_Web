@@ -25,6 +25,8 @@ namespace DOMAIN.Validador.Produto
                 .WithMessage("Quantidade de produtos não pode ser negativa.");
 
             RuleFor(produto => produto.UrlImagem)
+                .NotEmpty()
+                .WithMessage("A imagem do produto é obrigatória.")
                 .Must(uri => Uri.TryCreate(uri, UriKind.Absolute, out _))
                 .When(produto => !string.IsNullOrEmpty(produto.UrlImagem))
                 .WithMessage("A URL da imagem não é válida.");
@@ -54,6 +56,8 @@ namespace DOMAIN.Validador.Produto
                 .WithMessage("Quantidade de produtos não pode ser negativa.");
 
             RuleFor(produto => produto.UrlImagem)
+                .NotEmpty()
+                .WithMessage("A imagem do produto é obrigatória.")
                 .Must(uri => Uri.TryCreate(uri, UriKind.Absolute, out _))
                 .When(produto => !string.IsNullOrEmpty(produto.UrlImagem))
                 .WithMessage("A URL da imagem não é válida.");
