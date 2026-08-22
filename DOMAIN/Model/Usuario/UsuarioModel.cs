@@ -1,5 +1,4 @@
 using Google.Cloud.Firestore;
-using System;
 
 namespace DOMAIN.Model.Usuario
 {
@@ -15,7 +14,6 @@ namespace DOMAIN.Model.Usuario
         [FirestoreProperty("fullName")]
         public string? NomeCompleto { get; set; }
 
-        [FirestoreProperty("createdAt")]
         public long DataCriacao { get; set; }
 
         [FirestoreProperty("perfil")]

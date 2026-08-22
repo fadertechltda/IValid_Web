@@ -1,0 +1,94 @@
+@using DOMAIN.Model.Pedido
+@model List<PedidoModel>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Pedidos";
+    ViewData["ActivePage"] = "Pedido";
+    ViewData["PageTitle"] = "Gestão de Pedidos";
+    ViewData["PageSubtitle"] = "Visualize os pedidos feitos pelos usuários";
+}
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2 class="admin-card-title"><i class="fas fa-receipt me-2" style="color:var(--azul)"></i>Lista de Pedidos</h2>
+        <div class="d-flex gap-2 align-items-center">
+            <div class="position-relative" style="width: 250px;">
+                <i class="fas fa-search text-muted position-absolute" style="left: 14px; top: 50%; transform: translateY(-50%); font-size: 14px;"></i>
+                <input type="text" id="campoBusca" class="form-control" placeholder="Buscar pedido..."
+                       style="padding-left: 38px; border-radius: 10px; border: 1.5px solid #e8eaef; font-size: 14px; height: 42px; box-shadow: none;" oninput="filtrarTabela()">
+            </div>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="text-center py-5">
+                <i class="fas fa-receipt" style="font-size:48px; color:#ddd;"></i>
+                <p class="mt-3" style="color:#aaa; font-size:14px;">Nenhum pedido realizado ainda.</p>
+            </div>
+        }
+        else
+        {
+            <table class="table admin-table mb-0" id="tabelaPedidos">
+                <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Endereço</th>
+                        <th>Status</th>
+                        <th>Itens</th>
+                        <th>Total</th>
+                        <th>Data do Pedido</th>
+                        <th style="text-align:center">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var pedido in Model)
+                    {
+                        <tr data-status="@pedido.Status?.ToUpper()">
+                            <td>
+                                <div style="font-weight:600;font-size:13px;color:#1a1a2e;">@(pedido.ClienteNome ?? "Cliente não encontrado")</div>
+                                <div style="font-size:11px;color:#aaa;">ID: @(pedido.UsuarioId?.Length > 8 ? pedido.UsuarioId.Substring(0, 8) + "..." : pedido.UsuarioId)</div>
+                            </td>
+                            <td style="font-size:12px;color:#555;">@pedido.Endereco</td>
+                            <td>
+                                @await Html.PartialAsync("~/Views/Shared/Componentes/_BadgeStatusPedido.cshtml", pedido.Status)
+                            </td>
+                            <td>@pedido.Itens.Count item(s)</td>
+                            <td style="font-weight:700;color:var(--verde);">R$ @pedido.Total.ToString("F2")</td>
+                            <td>
+                                <div style="font-size:12px; font-weight:600;">@pedido.DataPedido.ToString("dd/MM/yyyy")</div>
+                                <div style="font-size:11px; color:#aaa;">@pedido.DataPedido.ToString("HH:mm")</div>
+                            </td>
+                            <td>
+                                <div class="d-flex gap-1 justify-content-center">
+                                    <a asp-controller="Pedido" asp-action="Details" asp-route-id="@pedido.Id"
+                                       class="btn-icon view" title="Ver detalhes">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>
+
+@section Scripts {
+<script>
+    function removerAcentos(texto) {
+        return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function filtrarTabela() {
+        const termoBusca = removerAcentos(document.getElementById('campoBusca').value.toLowerCase());
+        document.querySelectorAll('#tabelaPedidos tbody tr').forEach(linha => {
+            const textoLinha = removerAcentos(linha.textContent.toLowerCase());
+            linha.style.display = textoLinha.includes(termoBusca) ? '' : 'none';
+        });
+    }
+</script>
+}

@@ -1,0 +1,27 @@
+@model string
+
+@{
+    var statusUpper = (Model ?? string.Empty).ToUpper();
+
+    string classeBadge = statusUpper switch
+    {
+        "PENDENTE"   => "badge-amarelo",
+        "EM_PREPARO" => "badge-esgotado",
+        "PRONTO"     => "badge-verde",
+        "CONCLUIDO"  => "badge-verde",
+        "CANCELADO"  => "badge-vermelho",
+        _            => "badge-amarelo"
+    };
+
+    string rotuloStatus = statusUpper switch
+    {
+        "PENDENTE"   => "Pendente",
+        "EM_PREPARO" => "Em Preparo",
+        "PRONTO"     => "Pronto",
+        "CONCLUIDO"  => "Concluído",
+        "CANCELADO"  => "Cancelado",
+        _            => "Pendente"
+    };
+}
+
+<span class="@classeBadge">@rotuloStatus</span>

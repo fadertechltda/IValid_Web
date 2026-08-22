@@ -18,6 +18,7 @@ namespace REPOSITORY.Mapeadores.Usuario
             DocumentSnapshot doc = snapshot.Documents[0];
             UsuarioModel usuario = doc.ConvertTo<UsuarioModel>();
             usuario.Id = doc.Id;
+            usuario.DataCriacao = ExtrairDataCriacao(doc);
 
             return usuario;
         }
@@ -32,6 +33,7 @@ namespace REPOSITORY.Mapeadores.Usuario
 
             UsuarioModel usuario = snapshot.ConvertTo<UsuarioModel>();
             usuario.Id = snapshot.Id;
+            usuario.DataCriacao = ExtrairDataCriacao(snapshot);
 
             return usuario;
         }
@@ -39,7 +41,21 @@ namespace REPOSITORY.Mapeadores.Usuario
         public async Task CriarAsync(UsuarioModel usuario)
         {
             CollectionReference collection = _firestoreDb.Collection("users");
-            await collection.AddAsync(usuario);
+            DocumentReference docRef = await collection.AddAsync(usuario);
+            await docRef.UpdateAsync("createdAt", Timestamp.FromDateTime(DateTime.UtcNow));
+        }
+
+        private static long ExtrairDataCriacao(DocumentSnapshot snapshot)
+        {
+            if (!snapshot.TryGetValue<object>("createdAt", out var valor) || valor == null)
+                return 0;
+
+            return valor switch
+            {
+                Timestamp timestamp => timestamp.ToDateTimeOffset().ToUnixTimeMilliseconds(),
+                long milissegundos => milissegundos,
+                _ => 0
+            };
         }
     }
 }

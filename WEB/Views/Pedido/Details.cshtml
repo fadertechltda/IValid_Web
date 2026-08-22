@@ -1,0 +1,77 @@
+@using DOMAIN.Model.Pedido
+@model PedidoModel
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Detalhes do Pedido";
+    ViewData["ActivePage"] = "Pedido";
+    ViewData["PageTitle"] = "Detalhes do Pedido";
+    ViewData["PageSubtitle"] = "Informações completas do pedido";
+}
+
+<div class="row justify-content-center">
+    <div class="col-xl-8">
+
+        <div class="mb-4 d-flex align-items-center gap-3 p-3"
+             style="background:white; border-radius:14px; box-shadow:0 2px 10px rgba(0,0,0,0.06); border:1px solid #eef0f4;">
+
+            <div class="flex-grow-1">
+                <div style="font-weight:700;font-size:16px;color:#1a1a2e;">@(Model?.ClienteNome ?? "Cliente não encontrado")</div>
+                <div style="font-size:12px;color:#aaa;margin-top:2px;">ID do Usuário: @Model?.UsuarioId</div>
+                <div style="font-size:12px;color:#aaa;margin-top:2px;">@Model?.Endereco</div>
+                <div style="font-size:11px;color:#aaa;margin-top:2px;">Forma de pagamento: @Model?.FormaPagamento</div>
+                <div style="font-size:11px;color:#aaa;margin-top:2px;">ID do Pedido: @Model?.Id</div>
+            </div>
+
+            @await Html.PartialAsync("~/Views/Shared/Componentes/_BadgeStatusPedido.cshtml", Model?.Status)
+        </div>
+
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h2 class="admin-card-title"><i class="fas fa-box me-2" style="color:var(--azul)"></i>Itens do Pedido</h2>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table admin-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Produto</th>
+                            <th>Quantidade</th>
+                            <th>Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model?.Itens != null)
+                        {
+                            @foreach (var item in Model.Itens)
+                            {
+                                <tr>
+                                    <td style="font-weight:600;font-size:13px;color:#1a1a2e;">@item.NomeProduto</td>
+                                    <td>@item.Quantidade</td>
+                                    <td style="font-weight:700;">R$ @item.Subtotal.ToString("F2")</td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="p-4 d-flex justify-content-between align-items-center" style="border-top:1px solid #eef0f4;">
+                <div>
+                    <div style="font-size:12px;color:#aaa;">Data do Pedido</div>
+                    <div style="font-weight:600;font-size:14px;">@Model?.DataPedido.ToString("dd/MM/yyyy HH:mm")</div>
+                </div>
+                <div class="text-end">
+                    <div style="font-size:12px;color:#aaa;">Valor Total</div>
+                    <div style="font-weight:700;font-size:20px;color:var(--verde);">R$ @Model?.Total.ToString("F2")</div>
+                </div>
+            </div>
+
+            <div class="p-4 pt-0 d-flex justify-content-end">
+                <a asp-controller="Pedido" asp-action="Index" class="btn-outline-custom" style="text-decoration:none;">
+                    <i class="fas fa-arrow-left me-1"></i> Voltar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

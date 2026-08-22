@@ -1,9 +1,13 @@
 using DOMAIN.Validador.Produto;
+using DOMAIN.Validador.Configuracao;
 using Google.Cloud.Firestore;
 using REPOSITORY.Mapeadores.Produto;
+using REPOSITORY.Mapeadores.Usuario;
+using REPOSITORY.Mapeadores.Configuracao;
+using REPOSITORY.Mapeadores.Pedido;
 using SERVICE.Fachada;
 using SERVICE.Processo;
-using Scalar.AspNetCore; 
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,14 +29,18 @@ builder.Services.AddScoped<ProdutoProcesso>();
 builder.Services.AddScoped<ProdutoFachada>();
 builder.Services.AddScoped<ProdutoValidacao>();
 
-builder.Services.AddScoped<REPOSITORY.Mapeadores.Usuario.IUsuarioMapeador, REPOSITORY.Mapeadores.Usuario.UsuarioMapeador>();
+builder.Services.AddScoped<IUsuarioMapeador, UsuarioMapeador>();
 builder.Services.AddScoped<UsuarioProcesso>();
 builder.Services.AddScoped<UsuarioFachada>();
 
-builder.Services.AddScoped<REPOSITORY.Mapeadores.Configuracao.IConfiguracaoMapeador, REPOSITORY.Mapeadores.Configuracao.ConfiguracaoMapeador>();
+builder.Services.AddScoped<IConfiguracaoMapeador, ConfiguracaoMapeador>();
 builder.Services.AddScoped<ConfiguracaoProcesso>();
 builder.Services.AddScoped<ConfiguracaoFachada>();
-builder.Services.AddScoped<DOMAIN.Validador.Configuracao.ConfiguracaoValidacao>();
+builder.Services.AddScoped<ConfiguracaoValidacao>();
+
+builder.Services.AddScoped<IPedidoMapeador, PedidoMapeador>();
+builder.Services.AddScoped<PedidoProcesso>();
+builder.Services.AddScoped<PedidoFachada>();
 
 builder.Services.AddControllers();
 
