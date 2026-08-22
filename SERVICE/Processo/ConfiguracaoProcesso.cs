@@ -7,10 +7,10 @@ namespace SERVICE.Processo
     {
         private readonly IConfiguracaoMapeador _configuracaoMapeador = configuracaoMapeador;
 
-        public async Task<ConfiguracaoModel> ObterConfiguracao()
+        public async Task<ConfiguracaoModel> ObterConfiguracao(string supermercadoId)
         {
-            var configuracao = await _configuracaoMapeador.ObterAsync();
-            return configuracao ?? new ConfiguracaoModel();
+            var configuracao = await _configuracaoMapeador.ObterAsync(supermercadoId);
+            return configuracao ?? new ConfiguracaoModel { SupermercadoId = supermercadoId };
         }
 
         public async Task SalvarConfiguracao(ConfiguracaoModel configuracao)

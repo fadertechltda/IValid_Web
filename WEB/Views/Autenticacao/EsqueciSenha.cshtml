@@ -176,5 +176,19 @@
         </a>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var alertas = document.querySelectorAll('.alert-custom, .alert-sucesso');
+            alertas.forEach(function (alerta) {
+                setTimeout(function () {
+                    alerta.style.transition = 'opacity 0.4s ease';
+                    alerta.style.opacity = '0';
+                    setTimeout(function () {
+                        alerta.remove();
+                    }, 400);
+                }, 4000);
+            });
+        });
+    </script>
 </body>
 </html>

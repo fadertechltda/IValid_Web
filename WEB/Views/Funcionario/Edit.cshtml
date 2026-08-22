@@ -1,0 +1,79 @@
+@using DOMAIN.Model.Funcionario
+@model AtualizarFuncionarioModel
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Editar Funcionário";
+    ViewData["ActivePage"] = "Funcionario";
+    ViewData["PageTitle"] = "Editar Funcionário";
+    ViewData["PageSubtitle"] = "Atualize os dados do funcionário";
+
+    ViewData["Titulo"]           = "Editar Funcionário";
+    ViewData["Icone"]            = "fa-user-edit";
+    ViewData["CorIcone"]         = "var(--amarelo)";
+    ViewData["ControllerVoltar"] = "Funcionario";
+    ViewData["ActionVoltar"]     = "Index";
+}
+
+<div class="row justify-content-center">
+    <div class="col-xl-8">
+        <div class="admin-card">
+
+            @await Html.PartialAsync("~/Views/Shared/Componentes/_CabecalhoFormulario.cshtml")
+
+            <div class="p-4">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert-admin danger mb-4">
+                        <i class="fas fa-exclamation-circle"></i>
+                        @Html.ValidationSummary(false)
+                    </div>
+                }
+
+                <form asp-controller="Funcionario" asp-action="Edit" asp-route-id="@Model.Id" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+
+                    <div class="row g-4">
+
+                        <div class="col-12">
+                            <label class="form-label-custom">Nome do Funcionário *</label>
+                            <input asp-for="Nome" class="form-control form-control-custom w-100" />
+                            <span asp-validation-for="Nome" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label-custom">Perfil *</label>
+                            <select asp-for="Perfil" class="form-control form-control-custom w-100" asp-items="Html.GetEnumSelectList<PerfilFuncionario>()"></select>
+                            <span asp-validation-for="Perfil" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label-custom">Nova Senha (opcional)</label>
+                            <input asp-for="NovaSenha" type="password" class="form-control form-control-custom w-100" autocomplete="new-password" placeholder="Deixe em branco para manter a senha atual" />
+                            <span asp-validation-for="NovaSenha" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <div class="form-check">
+                                <input asp-for="Ativo" type="checkbox" class="form-check-input" />
+                                <label asp-for="Ativo" class="form-check-label">Funcionário ativo (desmarque para bloquear o acesso)</label>
+                            </div>
+                        </div>
+
+                        <div class="col-12 d-flex justify-content-end gap-3 pt-2">
+                            <a asp-controller="Funcionario" asp-action="Index" class="btn-outline-custom" style="text-decoration:none;">
+                                <i class="fas fa-times me-1"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn-success-custom">
+                                <i class="fas fa-save me-1"></i> Salvar Alterações
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>

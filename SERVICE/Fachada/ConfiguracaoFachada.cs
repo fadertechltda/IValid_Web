@@ -10,9 +10,9 @@ namespace SERVICE.Fachada
         private readonly ConfiguracaoProcesso _configuracaoProcesso = configuracaoProcesso;
         private readonly ConfiguracaoValidacao _validador = validador;
 
-        public async Task<ConfiguracaoModel> ObterConfiguracao()
+        public async Task<ConfiguracaoModel> ObterConfiguracao(string supermercadoId)
         {
-            return await _configuracaoProcesso.ObterConfiguracao();
+            return await _configuracaoProcesso.ObterConfiguracao(supermercadoId);
         }
 
         public async Task AtualizarConfiguracao(ConfiguracaoModel configuracao)

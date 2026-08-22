@@ -1,4 +1,5 @@
 using DOMAIN.Model.Configuracao;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Excecoes;
 using System.Text;
@@ -6,11 +7,14 @@ using System.Text.Json;
 
 namespace WEB.Controllers
 {
+    [Authorize(Roles = "Administrador")]
     public class ConfiguracaoController(IHttpClientFactory httpClientFactory, ILogger<ConfiguracaoController> logger) : Controller
     {
         private readonly HttpClient _clienteHttp = httpClientFactory.CreateClient("IValidApi");
         private readonly ILogger<ConfiguracaoController> _logger = logger;
         private readonly string _apiUrl = "api/Configuracao";
+
+        private string SupermercadoId => User.FindFirst("SupermercadoId")?.Value ?? string.Empty;
 
         public async Task<IActionResult> Index()
         {
@@ -18,7 +22,7 @@ namespace WEB.Controllers
 
             try
             {
-                var resposta = await _clienteHttp.GetAsync(_apiUrl);
+                var resposta = await _clienteHttp.GetAsync($"{_apiUrl}?supermercadoId={SupermercadoId}");
 
                 if (resposta.IsSuccessStatusCode)
                 {
@@ -45,6 +49,7 @@ namespace WEB.Controllers
         {
             try
             {
+                configuracao.SupermercadoId = SupermercadoId;
                 var textoJson = JsonSerializer.Serialize(configuracao);
                 var conteudo = new StringContent(textoJson, Encoding.UTF8, "application/json");
 

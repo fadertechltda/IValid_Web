@@ -267,8 +267,18 @@
                 </div>
 
                 <div>
-                    <label asp-for="CodigoConvite" class="form-label-custom">Código de Convite de Administrador</label>
-                    <input asp-for="CodigoConvite" type="text" class="form-control form-control-custom" placeholder="Fornecido por quem já administra o IValid" required autocomplete="off" />
+                    <label asp-for="NomeSupermercado" class="form-label-custom">Nome do Supermercado</label>
+                    <input asp-for="NomeSupermercado" type="text" class="form-control form-control-custom" placeholder="Ex: Supermercado Bom Preço" required autocomplete="off" />
+                </div>
+
+                <div>
+                    <label asp-for="CnpjSupermercado" class="form-label-custom">CNPJ</label>
+                    <input asp-for="CnpjSupermercado" type="text" class="form-control form-control-custom" placeholder="00.000.000/0000-00" autocomplete="off" />
+                </div>
+
+                <div>
+                    <label asp-for="EnderecoSupermercado" class="form-label-custom">Endereço do Supermercado</label>
+                    <input asp-for="EnderecoSupermercado" type="text" class="form-control form-control-custom" placeholder="Ex: Rua das Flores, 123" autocomplete="off" />
                 </div>
 
                 <button type="submit" class="btn-login">
@@ -296,6 +306,19 @@
                 icon.classList.add('fa-eye');
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var alertas = document.querySelectorAll('.alert-custom, .alert-sucesso');
+            alertas.forEach(function (alerta) {
+                setTimeout(function () {
+                    alerta.style.transition = 'opacity 0.4s ease';
+                    alerta.style.opacity = '0';
+                    setTimeout(function () {
+                        alerta.remove();
+                    }, 400);
+                }, 4000);
+            });
+        });
     </script>
 </body>
 </html>

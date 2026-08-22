@@ -54,8 +54,24 @@ namespace REPOSITORY.Mapeadores.Produto
             }
 
             return null;
-        }      
-     
+        }
+
+        public async Task<List<ProdutoModel>> ListarPorSupermercadoAsync(string supermercadoId)
+        {
+            Query query = _firestoreDb.Collection("produtos").WhereEqualTo("supermercadoId", supermercadoId);
+            QuerySnapshot snapshot = await query.GetSnapshotAsync();
+
+            List<ProdutoModel> lista = [.. snapshot.Documents.Select(doc =>
+            {
+                ProdutoModel produto = doc.ConvertTo<ProdutoModel>();
+                produto.Id = doc.Id;
+
+                return produto;
+            })];
+
+            return lista;
+        }
+
         private static void NormalizarDatas(ProdutoModel produto)
         {
             produto.DataVencimento = DateTime.SpecifyKind(produto.DataVencimento, DateTimeKind.Utc);

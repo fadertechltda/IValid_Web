@@ -14,6 +14,9 @@ namespace DOMAIN.Model.Usuario
         [FirestoreProperty("fullName")]
         public string? NomeCompleto { get; set; }
 
+        [FirestoreProperty("supermercadoId")]
+        public string? SupermercadoId { get; set; }
+
         public long DataCriacao { get; set; }
 
         [FirestoreProperty("perfil")]

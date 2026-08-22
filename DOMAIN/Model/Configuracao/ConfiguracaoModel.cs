@@ -8,6 +8,9 @@ namespace DOMAIN.Model.Configuracao
         [FirestoreDocumentId]
         public string? Id { get; set; }
 
+        [FirestoreProperty("supermercadoId")]
+        public string? SupermercadoId { get; set; }
+
         [FirestoreProperty("diasAlertaAmarelo")]
         public int DiasAlertaAmarelo { get; set; } = 20;
 

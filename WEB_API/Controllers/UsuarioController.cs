@@ -19,41 +19,14 @@ namespace WEB_API.Controllers
         private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
         private readonly ILogger<UsuarioController> _logger = logger;
         private readonly string? _firebaseApiKey = configuration["Firebase:ApiKey"];
-        private readonly string? _codigoConviteAdmin = configuration["Seguranca:CodigoConviteAdmin"];
 
-        [HttpPost("login")]
-        public async Task<IActionResult> Login([FromBody] LoginModel login)
+        [HttpGet("usuarios-loja")]
+        public async Task<IActionResult> UsuariosLoja([FromQuery] string codigoLoja)
         {
             try
             {
-                if (string.IsNullOrEmpty(login.Email) || string.IsNullOrEmpty(login.Senha))
-                {
-                    return BadRequest(new ExcecaoDetalhes { Codigo = CodigoExcecao.ValidacaoSeguranca, InformacaoAdicional = "Email e senha são obrigatórios." });
-                }
-
-                if (string.IsNullOrEmpty(_firebaseApiKey))
-                {
-                    throw new IValidExcecao(CodigoExcecao.Generico, "A 'ApiKey' do Firebase não está configurada no appsettings.json da API. A validação de senha é impossível.");
-                }
-
-                using var clienteHttp = _httpClientFactory.CreateClient();
-                var corpoRequisicao = new
-                {
-                    email = login.Email,
-                    password = login.Senha,
-                    returnSecureToken = true
-                };
-
-                var conteudo = new StringContent(JsonSerializer.Serialize(corpoRequisicao), Encoding.UTF8, "application/json");
-                var resposta = await clienteHttp.PostAsync($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={_firebaseApiKey}", conteudo);
-
-                if (!resposta.IsSuccessStatusCode)
-                {
-                    throw new IValidExcecao(CodigoExcecao.ValidacaoSeguranca, "Email ou senha inválidos.");
-                }
-
-                UsuarioModel usuario = await _usuarioFachada.AutenticarAdministrador(login.Email);
-                return Ok(usuario);
+                var usuarios = await _usuarioFachada.ListarUsuariosParaLogin(codigoLoja);
+                return Ok(usuarios);
             }
             catch (IValidExcecao ex)
             {
@@ -61,7 +34,72 @@ namespace WEB_API.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro inesperado no login do usuário {Email}", login?.Email);
+                _logger.LogError(ex, "Erro inesperado ao listar usuários da loja {CodigoLoja}", codigoLoja);
+                return BadRequest(new ExcecaoDetalhes { Codigo = CodigoExcecao.Generico, InformacaoAdicional = "Não foi possível carregar os usuários desta loja." });
+            }
+        }
+
+        [HttpPost("login-loja")]
+        public async Task<IActionResult> LoginLoja([FromBody] LoginModel login)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(login.CodigoLoja) || string.IsNullOrEmpty(login.UsuarioChave) || string.IsNullOrEmpty(login.Senha))
+                {
+                    return BadRequest(new ExcecaoDetalhes { Codigo = CodigoExcecao.ValidacaoSeguranca, InformacaoAdicional = "Selecione o usuário e informe a senha." });
+                }
+
+                string[] partesChave = login.UsuarioChave.Split(':', 2);
+                if (partesChave.Length != 2)
+                {
+                    return BadRequest(new ExcecaoDetalhes { Codigo = CodigoExcecao.ValidacaoSeguranca, InformacaoAdicional = "Usuário selecionado é inválido." });
+                }
+
+                string tipo = partesChave[0];
+                string id = partesChave[1];
+                ResultadoLoginModel resultado;
+
+                if (tipo == "ADMIN")
+                {
+                    string email = await _usuarioFachada.ObterEmailParaLoja(id, login.CodigoLoja);
+
+                    if (string.IsNullOrEmpty(_firebaseApiKey))
+                    {
+                        throw new IValidExcecao(CodigoExcecao.Generico, "A 'ApiKey' do Firebase não está configurada no appsettings.json da API. A validação de senha é impossível.");
+                    }
+
+                    using var clienteHttp = _httpClientFactory.CreateClient();
+                    var corpoRequisicao = new
+                    {
+                        email,
+                        password = login.Senha,
+                        returnSecureToken = true
+                    };
+
+                    var conteudo = new StringContent(JsonSerializer.Serialize(corpoRequisicao), Encoding.UTF8, "application/json");
+                    var resposta = await clienteHttp.PostAsync($"https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key={_firebaseApiKey}", conteudo);
+
+                    if (!resposta.IsSuccessStatusCode)
+                    {
+                        throw new IValidExcecao(CodigoExcecao.ValidacaoSeguranca, "Senha inválida.");
+                    }
+
+                    resultado = await _usuarioFachada.AutenticarAdministradorPorId(id, login.CodigoLoja);
+                }
+                else
+                {
+                    resultado = await _usuarioFachada.AutenticarFuncionario(id, login.Senha, login.CodigoLoja);
+                }
+
+                return Ok(resultado);
+            }
+            catch (IValidExcecao ex)
+            {
+                return BadRequest(new ExcecaoDetalhes { Codigo = ex.Codigo, InformacaoAdicional = ex.InformacaoAdicional });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro inesperado no login da loja {CodigoLoja}", login?.CodigoLoja);
                 return BadRequest(new ExcecaoDetalhes { Codigo = CodigoExcecao.Generico, InformacaoAdicional = "Ocorreu um erro inesperado ao tentar autenticar. Tente novamente mais tarde." });
             }
         }
@@ -74,11 +112,6 @@ namespace WEB_API.Controllers
                 if (!ModelState.IsValid)
                 {
                     return BadRequest(new ExcecaoDetalhes { Codigo = CodigoExcecao.ValidacaoSeguranca, InformacaoAdicional = "Dados inválidos." });
-                }
-
-                if (string.IsNullOrEmpty(_codigoConviteAdmin) || registro.CodigoConvite != _codigoConviteAdmin)
-                {
-                    return BadRequest(new ExcecaoDetalhes { Codigo = CodigoExcecao.NaoAutorizado, InformacaoAdicional = "Código de convite de administrador inválido." });
                 }
 
                 if (string.IsNullOrEmpty(_firebaseApiKey))
@@ -118,8 +151,20 @@ namespace WEB_API.Controllers
                     throw new IValidExcecao(CodigoExcecao.ValidacaoSeguranca, mensagem);
                 }
 
-                await _usuarioFachada.CriarAdministrador(registro);
-                return Ok();
+                var conteudoSignUp = await resposta.Content.ReadAsStringAsync();
+                using var documentoSignUp = JsonDocument.Parse(conteudoSignUp);
+                var idTokenCriado = documentoSignUp.RootElement.TryGetProperty("idToken", out var elementoIdToken) ? elementoIdToken.GetString() : null;
+
+                try
+                {
+                    string codigoAcesso = await _usuarioFachada.CriarAdministrador(registro);
+                    return Ok(new { CodigoAcesso = codigoAcesso });
+                }
+                catch
+                {
+                    await ReverterUsuarioFirebaseAsync(clienteHttp, idTokenCriado, registro.Email);
+                    throw;
+                }
             }
             catch (IValidExcecao ex)
             {
@@ -167,6 +212,25 @@ namespace WEB_API.Controllers
             {
                 _logger.LogError(ex, "Erro inesperado ao solicitar redefinição de senha para {Email}", modelo?.Email);
                 return Ok();
+            }
+        }
+
+        private async Task ReverterUsuarioFirebaseAsync(HttpClient clienteHttp, string? idToken, string? email)
+        {
+            if (string.IsNullOrEmpty(idToken))
+            {
+                return;
+            }
+
+            try
+            {
+                var corpoExclusao = new { idToken };
+                var conteudoExclusao = new StringContent(JsonSerializer.Serialize(corpoExclusao), Encoding.UTF8, "application/json");
+                await clienteHttp.PostAsync($"https://identitytoolkit.googleapis.com/v1/accounts:delete?key={_firebaseApiKey}", conteudoExclusao);
+            }
+            catch (Exception exExclusao)
+            {
+                _logger.LogError(exExclusao, "Falha ao reverter usuário Firebase órfão para {Email}", email);
             }
         }
 

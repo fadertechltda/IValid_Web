@@ -1,0 +1,63 @@
+@using DOMAIN.Model.Funcionario
+@model List<FuncionarioModel>
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Funcionários";
+    ViewData["ActivePage"] = "Funcionario";
+    ViewData["PageTitle"] = "Funcionários";
+    ViewData["PageSubtitle"] = "Cadastre e gerencie os funcionários da sua loja";
+}
+
+<div class="admin-card">
+    <div class="admin-card-header">
+        <h2 class="admin-card-title"><i class="fas fa-users me-2" style="color:var(--vermelho)"></i>Lista de Funcionários</h2>
+        <a asp-controller="Funcionario" asp-action="Create" class="btn-danger-custom d-flex align-items-center gap-2" style="text-decoration:none;">
+            <i class="fas fa-plus"></i> Novo Funcionário
+        </a>
+    </div>
+
+    <div class="table-responsive">
+        @if (Model == null || !Model.Any())
+        {
+            <div class="p-4 text-center text-muted">Nenhum funcionário cadastrado ainda.</div>
+        }
+        else
+        {
+            <table class="table align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Perfil</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var funcionario in Model)
+                    {
+                        <tr>
+                            <td>@funcionario.Nome</td>
+                            <td>@funcionario.Perfil</td>
+                            <td>
+                                @if (funcionario.Ativo)
+                                {
+                                    <span class="badge-verde">ATIVO</span>
+                                }
+                                else
+                                {
+                                    <span class="badge-vermelho">INATIVO</span>
+                                }
+                            </td>
+                            <td class="text-end">
+                                <a asp-controller="Funcionario" asp-action="Edit" asp-route-id="@funcionario.Id" class="btn-outline-custom" style="text-decoration:none;">
+                                    <i class="fas fa-edit"></i> Editar
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+    </div>
+</div>

@@ -6,6 +6,7 @@ namespace REPOSITORY.Mapeadores.Usuario
     {
         Task<UsuarioModel?> ObterPorEmailAsync(string email);
         Task<UsuarioModel?> ObterPorIdAsync(string id);
+        Task<UsuarioModel?> ObterPorSupermercadoIdAsync(string supermercadoId);
         Task CriarAsync(UsuarioModel usuario);
     }
 }

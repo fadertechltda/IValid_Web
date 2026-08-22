@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace WEB.Controllers.Produto
 {
-    [Authorize]
+    [Authorize(Roles = "Administrador,Gerente,OperadorEstoque")]
     public class ProdutoController(IHttpClientFactory httpClientFactory, ILogger<ProdutoController> logger) : Controller
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("IValidApi");
@@ -17,11 +17,13 @@ namespace WEB.Controllers.Produto
         private readonly string _apiUrl = "api/Produto";
         private readonly string _apiUrlConfiguracao = "api/Configuracao";
 
+        private string SupermercadoId => User.FindFirst("SupermercadoId")?.Value ?? string.Empty;
+
         public async Task<IActionResult> Index()
         {
             List<ProdutoModel>? produtos = [];
 
-            var response = await _httpClient.GetAsync(_apiUrl);
+            var response = await _httpClient.GetAsync($"{_apiUrl}?supermercadoId={SupermercadoId}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -51,7 +53,7 @@ namespace WEB.Controllers.Produto
                 var json = JsonSerializer.Serialize(produto);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PostAsync(_apiUrl, content);
+                var response = await _httpClient.PostAsync($"{_apiUrl}?supermercadoId={SupermercadoId}", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -76,7 +78,7 @@ namespace WEB.Controllers.Produto
         {
             if (string.IsNullOrEmpty(id)) return NotFound();
 
-            var response = await _httpClient.GetAsync($"{_apiUrl}/{id}");
+            var response = await _httpClient.GetAsync($"{_apiUrl}/{id}?supermercadoId={SupermercadoId}");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -102,7 +104,7 @@ namespace WEB.Controllers.Produto
                 var json = JsonSerializer.Serialize(produto);
                 var content = new StringContent(json, Encoding.UTF8, "application/json");
 
-                var response = await _httpClient.PutAsync($"{_apiUrl}/{id}", content);
+                var response = await _httpClient.PutAsync($"{_apiUrl}/{id}?supermercadoId={SupermercadoId}", content);
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -127,7 +129,7 @@ namespace WEB.Controllers.Produto
         {
             if (string.IsNullOrEmpty(id)) return NotFound();
 
-            var response = await _httpClient.GetAsync($"{_apiUrl}/{id}");
+            var response = await _httpClient.GetAsync($"{_apiUrl}/{id}?supermercadoId={SupermercadoId}");
 
             if (!response.IsSuccessStatusCode)
             {
@@ -147,7 +149,7 @@ namespace WEB.Controllers.Produto
         {
             try
             {
-                var response = await _httpClient.DeleteAsync($"{_apiUrl}/{id}");
+                var response = await _httpClient.DeleteAsync($"{_apiUrl}/{id}?supermercadoId={SupermercadoId}");
 
                 if (response.IsSuccessStatusCode)
                 {
@@ -172,7 +174,7 @@ namespace WEB.Controllers.Produto
         {
             try
             {
-                var response = await _httpClient.GetAsync(_apiUrlConfiguracao);
+                var response = await _httpClient.GetAsync($"{_apiUrlConfiguracao}?supermercadoId={SupermercadoId}");
 
                 if (response.IsSuccessStatusCode)
                 {

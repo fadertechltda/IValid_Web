@@ -1,0 +1,78 @@
+@using DOMAIN.Model.Funcionario
+@model CriarFuncionarioModel
+
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Novo Funcionário";
+    ViewData["ActivePage"] = "Funcionario";
+    ViewData["PageTitle"] = "Cadastrar Funcionário";
+    ViewData["PageSubtitle"] = "Preencha os dados para adicionar um novo funcionário";
+
+    ViewData["Titulo"]           = "Novo Funcionário";
+    ViewData["Icone"]            = "fa-user-plus";
+    ViewData["CorIcone"]         = "var(--verde)";
+    ViewData["ControllerVoltar"] = "Funcionario";
+    ViewData["ActionVoltar"]     = "Index";
+}
+
+<div class="row justify-content-center">
+    <div class="col-xl-8">
+        <div class="admin-card">
+
+            @await Html.PartialAsync("~/Views/Shared/Componentes/_CabecalhoFormulario.cshtml")
+
+            <div class="p-4">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert-admin danger mb-4">
+                        <i class="fas fa-exclamation-circle"></i>
+                        @Html.ValidationSummary(false)
+                    </div>
+                }
+
+                <form asp-controller="Funcionario" asp-action="Create" method="post">
+                    @Html.AntiForgeryToken()
+
+                    <div class="row g-4">
+
+                        <div class="col-12">
+                            <label class="form-label-custom">Nome do Funcionário *</label>
+                            <input asp-for="Nome" class="form-control form-control-custom w-100"
+                                   placeholder="Ex: Maria da Silva" />
+                            <span asp-validation-for="Nome" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label-custom">Perfil *</label>
+                            <select asp-for="Perfil" class="form-control form-control-custom w-100" asp-items="Html.GetEnumSelectList<PerfilFuncionario>()"></select>
+                            <span asp-validation-for="Perfil" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Senha *</label>
+                            <input asp-for="Senha" type="password" class="form-control form-control-custom w-100" autocomplete="new-password" />
+                            <span asp-validation-for="Senha" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Confirmar Senha *</label>
+                            <input asp-for="ConfirmarSenha" type="password" class="form-control form-control-custom w-100" autocomplete="new-password" />
+                            <span asp-validation-for="ConfirmarSenha" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+
+                        <div class="col-12 d-flex justify-content-end gap-3 pt-2">
+                            <a asp-controller="Funcionario" asp-action="Index" class="btn-outline-custom" style="text-decoration:none;">
+                                <i class="fas fa-times me-1"></i> Cancelar
+                            </a>
+                            <button type="submit" class="btn-success-custom">
+                                <i class="fas fa-save me-1"></i> Salvar Funcionário
+                            </button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+        </div>
+    </div>
+</div>

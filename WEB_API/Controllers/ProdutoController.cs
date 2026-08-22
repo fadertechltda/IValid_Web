@@ -12,10 +12,11 @@ namespace WEB_API.Controllers
         private readonly ProdutoFachada _produtoFachada = produtoFachada;
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] ProdutoModel produto)
+        public async Task<IActionResult> Post([FromBody] ProdutoModel produto, [FromQuery] string supermercadoId)
         {
             try
             {
+                produto.SupermercadoId = supermercadoId;
                 await _produtoFachada.CadastrarProdutos(produto);
                 return Created();
             }
@@ -30,10 +31,18 @@ namespace WEB_API.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromBody] ProdutoModel produto)
+        public async Task<IActionResult> Put([FromBody] ProdutoModel produto, [FromQuery] string supermercadoId)
         {
             try
             {
+                ProdutoModel? produtoExistente = await _produtoFachada.ListarProdutoPorId(produto.Id!, supermercadoId);
+
+                if (produtoExistente == null)
+                {
+                    throw new IValidExcecao(CodigoExcecao.EntidadeNaoEncontrada, "Produto não encontrado.");
+                }
+
+                produto.SupermercadoId = supermercadoId;
                 await _produtoFachada.AtualizarProdutos(produto);
                 return NoContent();
             }
@@ -48,13 +57,13 @@ namespace WEB_API.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete(string id)
+        public async Task<IActionResult> Delete(string id, [FromQuery] string supermercadoId)
         {
             try
             {
-                ProdutoModel? produto = await _produtoFachada.ListarProdutoPorId(id);
+                ProdutoModel? produto = await _produtoFachada.ListarProdutoPorId(id, supermercadoId);
 
-                if (produto == null) 
+                if (produto == null)
                 {
                     throw new IValidExcecao(CodigoExcecao.EntidadeNaoEncontrada, "Produto não encontrado.");
                 }
@@ -74,16 +83,16 @@ namespace WEB_API.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery] string supermercadoId)
         {
-            var produtos = await _produtoFachada.ListarProdutos();
+            var produtos = await _produtoFachada.ListarProdutos(supermercadoId);
             return Ok(produtos);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(string id, [FromQuery] string supermercadoId)
         {
-            ProdutoModel? produto = await _produtoFachada.ListarProdutoPorId(id);
+            ProdutoModel? produto = await _produtoFachada.ListarProdutoPorId(id, supermercadoId);
 
             if (produto == null)
             {

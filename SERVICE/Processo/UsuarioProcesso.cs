@@ -17,6 +17,11 @@ namespace SERVICE.Processo
             return await _usuarioMapeador.ObterPorIdAsync(id);
         }
 
+        public async Task<UsuarioModel?> ObterPorSupermercadoIdAsync(string supermercadoId)
+        {
+            return await _usuarioMapeador.ObterPorSupermercadoIdAsync(supermercadoId);
+        }
+
         public async Task CriarAdministradorAsync(UsuarioModel usuario)
         {
             usuario.Perfil = TipoUsuario.Administrador;

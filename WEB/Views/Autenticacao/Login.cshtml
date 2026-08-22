@@ -1,7 +1,10 @@
-@model DOMAIN.Model.Usuario.LoginModel
+@using DOMAIN.Model.Usuario
+@model LoginModel
 @{
     Layout = null;
     ViewData["Title"] = "Entrar";
+    var usuarios = ViewData["Usuarios"] as List<UsuarioLoginModel> ?? [];
+    var lojaSelecionada = ViewData["LojaSelecionada"] != null;
 }
 
 <!DOCTYPE html>
@@ -253,26 +256,56 @@
             }
 
             <form asp-controller="Autenticacao" asp-action="Login" method="post">
-                <div class="mb-3">
-                    <label asp-for="Email" class="form-label-custom">Email</label>
-                    <input asp-for="Email" type="email" class="form-control form-control-custom" placeholder="exemplo@ivalid.com" required autocomplete="username" />
-                </div>
+                @Html.AntiForgeryToken()
 
-                <div class="mb-3">
-                    <label asp-for="Senha" class="form-label-custom">Senha</label>
-                    <div style="position: relative;">
-                        <input asp-for="Senha" type="password" id="campoSenha" class="form-control form-control-custom" placeholder="••••••••" required autocomplete="current-password" />
-                        <button type="button" onclick="toggleSenha('campoSenha', this)" style="position: absolute; right: 10px; top: 12px; border: none; background: transparent; color: var(--text-muted-custom); cursor: pointer; outline: none;">
-                            <i class="far fa-eye"></i>
-                        </button>
+                @if (!lojaSelecionada)
+                {
+                    <div class="mb-3">
+                        <label asp-for="CodigoLoja" class="form-label-custom">Código da Loja</label>
+                        <input asp-for="CodigoLoja" type="text" class="form-control form-control-custom" placeholder="Ex: mercadobompreco123" required autocomplete="off" />
                     </div>
-                </div>
 
-                <a asp-controller="Autenticacao" asp-action="EsqueciSenha" class="forgot-password">Esqueceu a senha?</a>
+                    <button type="submit" name="etapa" value="buscar" class="btn-login">
+                        Continuar <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+                }
+                else
+                {
+                    <input type="hidden" asp-for="CodigoLoja" />
 
-                <button type="submit" class="btn-login">
-                    Entrar no Painel <i class="fas fa-arrow-right ms-2"></i>
-                </button>
+                    <div class="mb-3">
+                        <label class="form-label-custom">Usuário</label>
+                        <select asp-for="UsuarioChave" class="form-control form-control-custom" required>
+                            <option value="">Selecione o usuário</option>
+                            @foreach (var usuario in usuarios)
+                            {
+                                <option value="@usuario.Chave">@usuario.Nome</option>
+                            }
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label asp-for="Senha" class="form-label-custom">Senha</label>
+                        <div style="position: relative;">
+                            <input asp-for="Senha" type="password" id="campoSenha" class="form-control form-control-custom" placeholder="••••••••" required autocomplete="current-password" />
+                            <button type="button" onclick="toggleSenha('campoSenha', this)" style="position: absolute; right: 10px; top: 12px; border: none; background: transparent; color: var(--text-muted-custom); cursor: pointer; outline: none;">
+                                <i class="far fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <a asp-controller="Autenticacao" asp-action="EsqueciSenha" class="forgot-password">Esqueceu a senha?</a>
+
+                    <button type="submit" name="etapa" value="entrar" class="btn-login">
+                        Entrar no Painel <i class="fas fa-arrow-right ms-2"></i>
+                    </button>
+
+                    <div class="text-center mt-3">
+                        <a asp-controller="Autenticacao" asp-action="Login" style="font-size:13px; color:var(--text-muted-custom); text-decoration:none;">
+                            <i class="fas fa-arrow-left me-1"></i> Trocar de loja
+                        </a>
+                    </div>
+                }
             </form>
 
             <div class="text-center mt-4" style="font-size: 14px; color: var(--text-muted-custom);">
@@ -295,6 +328,19 @@
                 icon.classList.add('fa-eye');
             }
         }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            var alertas = document.querySelectorAll('.alert-custom, .alert-sucesso');
+            alertas.forEach(function (alerta) {
+                setTimeout(function () {
+                    alerta.style.transition = 'opacity 0.4s ease';
+                    alerta.style.opacity = '0';
+                    setTimeout(function () {
+                        alerta.remove();
+                    }, 400);
+                }, 4000);
+            });
+        });
     </script>
 </body>
 </html>

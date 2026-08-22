@@ -38,6 +38,22 @@ namespace REPOSITORY.Mapeadores.Usuario
             return usuario;
         }
 
+        public async Task<UsuarioModel?> ObterPorSupermercadoIdAsync(string supermercadoId)
+        {
+            Query query = _firestoreDb.Collection("users").WhereEqualTo("supermercadoId", supermercadoId);
+            QuerySnapshot snapshot = await query.GetSnapshotAsync();
+
+            if (snapshot.Documents.Count == 0)
+                return null;
+
+            DocumentSnapshot doc = snapshot.Documents[0];
+            UsuarioModel usuario = doc.ConvertTo<UsuarioModel>();
+            usuario.Id = doc.Id;
+            usuario.DataCriacao = ExtrairDataCriacao(doc);
+
+            return usuario;
+        }
+
         public async Task CriarAsync(UsuarioModel usuario)
         {
             CollectionReference collection = _firestoreDb.Collection("users");

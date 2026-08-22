@@ -12,16 +12,16 @@ namespace WEB_API.Controllers
         private readonly PedidoFachada _pedidoFachada = pedidoFachada;
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery] string supermercadoId)
         {
-            var pedidos = await _pedidoFachada.ListarPedidos();
+            var pedidos = await _pedidoFachada.ListarPedidos(supermercadoId);
             return Ok(pedidos);
         }
 
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetById(string id)
+        public async Task<IActionResult> GetById(string id, [FromQuery] string supermercadoId)
         {
-            PedidoModel? pedido = await _pedidoFachada.ListarPedidoPorId(id);
+            PedidoModel? pedido = await _pedidoFachada.ListarPedidoPorId(id, supermercadoId);
 
             if (pedido == null)
             {

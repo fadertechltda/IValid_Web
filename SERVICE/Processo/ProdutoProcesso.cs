@@ -26,11 +26,11 @@ namespace SERVICE.Processo
             await _produtoMapeador.DeletarAsync(produto);
         }
 
-        public async Task<List<ProdutoModel>> ListarProdutos()
+        public async Task<List<ProdutoModel>> ListarProdutos(string supermercadoId)
         {
-            var listaDeProdutos = await _produtoMapeador.ListarTodosAsync();
+            var listaDeProdutos = await _produtoMapeador.ListarPorSupermercadoAsync(supermercadoId);
 
-            var configuracao = await _configuracaoProcesso.ObterConfiguracao();
+            var configuracao = await _configuracaoProcesso.ObterConfiguracao(supermercadoId);
 
             foreach (var produto in listaDeProdutos)
             {
@@ -38,25 +38,28 @@ namespace SERVICE.Processo
             }
 
             return [.. listaDeProdutos
-                .OrderBy(p => PrioridadeStatus(p.Status))
+                .OrderBy(p => p.Esgotado)
+                .ThenBy(p => PrioridadeStatus(p.Status))
                 .ThenBy(p => p.DataVencimento)];
         }
 
-        public async Task<ProdutoModel?> ListarProdutoPorId(string id)
+        public async Task<ProdutoModel?> ListarProdutoPorId(string id, string supermercadoId)
         {
             var produto = await _produtoMapeador.ListarPorIdAsync(id);
 
-            if (produto != null)
+            if (produto == null || produto.SupermercadoId != supermercadoId)
             {
-                await CalcularStatusEPrecosAsync(produto);
+                return null;
             }
+
+            await CalcularStatusEPrecosAsync(produto);
 
             return produto;
         }
 
         public async Task CalcularStatusEPrecosAsync(ProdutoModel produto)
         {
-            var configuracao = await _configuracaoProcesso.ObterConfiguracao();
+            var configuracao = await _configuracaoProcesso.ObterConfiguracao(produto.SupermercadoId ?? string.Empty);
             AplicarRegras(produto, configuracao);
         }
 

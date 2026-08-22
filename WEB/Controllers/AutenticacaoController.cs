@@ -27,11 +27,24 @@ namespace WEB.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginModel modeloLogin)
+        public async Task<IActionResult> Login(LoginModel modeloLogin, string etapa)
         {
+            if (string.IsNullOrEmpty(modeloLogin.CodigoLoja))
+            {
+                ModelState.AddModelError(string.Empty, "Informe o código da loja.");
+                return View(modeloLogin);
+            }
+
+            if (etapa == "buscar" || string.IsNullOrEmpty(modeloLogin.UsuarioChave))
+            {
+                ModelState.Remove(nameof(LoginModel.UsuarioChave));
+                ModelState.Remove(nameof(LoginModel.Senha));
+                return await CarregarUsuariosDaLoja(modeloLogin);
+            }
+
             if (!ModelState.IsValid)
             {
-                return View(modeloLogin);
+                return await CarregarUsuariosDaLoja(modeloLogin);
             }
 
             try
@@ -39,21 +52,22 @@ namespace WEB.Controllers
                 var textoJson = JsonSerializer.Serialize(modeloLogin);
                 var conteudo = new StringContent(textoJson, Encoding.UTF8, "application/json");
 
-                var resposta = await _clienteHttp.PostAsync("api/Usuario/login", conteudo);
+                var resposta = await _clienteHttp.PostAsync("api/Usuario/login-loja", conteudo);
                 var respostaJson = await resposta.Content.ReadAsStringAsync();
 
                 if (resposta.IsSuccessStatusCode)
                 {
-                    var usuario = JsonSerializer.Deserialize<UsuarioModel>(respostaJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
+                    var resultado = JsonSerializer.Deserialize<ResultadoLoginModel>(respostaJson, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
-                    if (usuario != null)
+                    if (resultado != null)
                     {
                         var reivindicacoes = new List<Claim>
                         {
-                            new(ClaimTypes.Name, usuario.NomeCompleto ?? usuario.Email ?? "Usuário"),
-                            new(ClaimTypes.Email, usuario.Email ?? ""),
-                            new(ClaimTypes.Role, usuario.Perfil.ToString()),
-                            new(ClaimTypes.NameIdentifier, usuario.Id ?? "")
+                            new(ClaimTypes.Name, resultado.Nome ?? "Usuário"),
+                            new(ClaimTypes.Email, resultado.Email ?? ""),
+                            new(ClaimTypes.Role, resultado.Perfil ?? ""),
+                            new(ClaimTypes.NameIdentifier, resultado.Id ?? ""),
+                            new("SupermercadoId", resultado.SupermercadoId ?? "")
                         };
 
                         var identidadeReivindicacoes = new ClaimsIdentity(reivindicacoes, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -73,19 +87,54 @@ namespace WEB.Controllers
                     }
 
                     ModelState.AddModelError(string.Empty, "Não foi possível processar a resposta do servidor.");
-                    return View(modeloLogin);
                 }
-
-                var erroMsg = ExtrairMensagemErro(respostaJson);
-                ModelState.AddModelError(string.Empty, erroMsg);
+                else
+                {
+                    var erroMsg = ExtrairMensagemErro(respostaJson);
+                    ModelState.AddModelError(string.Empty, erroMsg);
+                }
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Erro de conexão com a API ao tentar autenticar {Email}", modeloLogin.Email);
+                _logger.LogError(ex, "Erro de conexão com a API ao tentar autenticar na loja {CodigoLoja}", modeloLogin.CodigoLoja);
                 ModelState.AddModelError(string.Empty, "Não foi possível conectar ao servidor. Tente novamente em instantes.");
             }
 
-            return View(modeloLogin);
+            return await CarregarUsuariosDaLoja(modeloLogin);
+        }
+
+        private async Task<IActionResult> CarregarUsuariosDaLoja(LoginModel modeloLogin)
+        {
+            try
+            {
+                var resposta = await _clienteHttp.GetAsync($"api/Usuario/usuarios-loja?codigoLoja={modeloLogin.CodigoLoja}");
+
+                if (!resposta.IsSuccessStatusCode)
+                {
+                    var erroMsg = await ExtrairMensagemErroAsync(resposta);
+                    ModelState.AddModelError(string.Empty, erroMsg);
+                    return View("Login", modeloLogin);
+                }
+
+                var json = await resposta.Content.ReadAsStringAsync();
+                var usuarios = JsonSerializer.Deserialize<List<UsuarioLoginModel>>(json, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
+
+                if (usuarios.Count == 0)
+                {
+                    ModelState.AddModelError(string.Empty, "Nenhum usuário encontrado para esta loja.");
+                    return View("Login", modeloLogin);
+                }
+
+                ViewData["Usuarios"] = usuarios;
+                ViewData["LojaSelecionada"] = true;
+                return View("Login", modeloLogin);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro de conexão com a API ao buscar usuários da loja {CodigoLoja}", modeloLogin.CodigoLoja);
+                ModelState.AddModelError(string.Empty, "Não foi possível conectar ao servidor. Tente novamente em instantes.");
+                return View("Login", modeloLogin);
+            }
         }
 
         [HttpGet]
@@ -116,7 +165,7 @@ namespace WEB.Controllers
 
                 if (resposta.IsSuccessStatusCode)
                 {
-                    TempData["Sucesso"] = "Conta criada com sucesso! Faça login.";
+                    TempData["Sucesso"] = "Conta criada com sucesso! Enviamos o código de acesso da sua loja para o e-mail informado. Verifique sua caixa de entrada (e o spam) para fazer login.";
                     return RedirectToAction("Login");
                 }
 

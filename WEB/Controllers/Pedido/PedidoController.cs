@@ -5,17 +5,19 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace WEB.Controllers.Pedido
 {
-    [Authorize]
+    [Authorize(Roles = "Administrador,Gerente,Atendente")]
     public class PedidoController(IHttpClientFactory httpClientFactory) : Controller
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("IValidApi");
         private readonly string _apiUrl = "api/Pedido";
 
+        private string SupermercadoId => User.FindFirst("SupermercadoId")?.Value ?? string.Empty;
+
         public async Task<IActionResult> Index()
         {
             List<PedidoModel>? pedidos = [];
 
-            var response = await _httpClient.GetAsync(_apiUrl);
+            var response = await _httpClient.GetAsync($"{_apiUrl}?supermercadoId={SupermercadoId}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -34,7 +36,7 @@ namespace WEB.Controllers.Pedido
         {
             if (string.IsNullOrEmpty(id)) return NotFound();
 
-            var response = await _httpClient.GetAsync($"{_apiUrl}/{id}");
+            var response = await _httpClient.GetAsync($"{_apiUrl}/{id}?supermercadoId={SupermercadoId}");
 
             if (!response.IsSuccessStatusCode)
             {

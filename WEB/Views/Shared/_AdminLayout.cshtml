@@ -401,23 +401,37 @@
             </a>
 
             <div class="nav-section-title">Gestão</div>
-            <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Produto" ? "active" : "")"
-               asp-controller="Produto" asp-action="Index">
-                <span class="icon"><i class="fas fa-box-open"></i></span>
-                Produtos
-            </a>
-            <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Pedido" ? "active" : "")"
-               asp-controller="Pedido" asp-action="Index">
-                <span class="icon"><i class="fas fa-receipt"></i></span>
-                Pedidos
-            </a>
+            @if (User.IsInRole("Administrador") || User.IsInRole("Gerente") || User.IsInRole("OperadorEstoque"))
+            {
+                <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Produto" ? "active" : "")"
+                   asp-controller="Produto" asp-action="Index">
+                    <span class="icon"><i class="fas fa-box-open"></i></span>
+                    Produtos
+                </a>
+            }
+            @if (User.IsInRole("Administrador") || User.IsInRole("Gerente") || User.IsInRole("Atendente"))
+            {
+                <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Pedido" ? "active" : "")"
+                   asp-controller="Pedido" asp-action="Index">
+                    <span class="icon"><i class="fas fa-receipt"></i></span>
+                    Pedidos
+                </a>
+            }
 
-            <div class="nav-section-title">Sistema</div>
-            <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Configuracoes" ? "active" : "")"
-               asp-controller="Configuracao" asp-action="Index">
-                <span class="icon"><i class="fas fa-cog"></i></span>
-                Configurações
-            </a>
+            @if (User.IsInRole("Administrador"))
+            {
+                <div class="nav-section-title">Sistema</div>
+                <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Funcionario" ? "active" : "")"
+                   asp-controller="Funcionario" asp-action="Index">
+                    <span class="icon"><i class="fas fa-users"></i></span>
+                    Funcionários
+                </a>
+                <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Configuracoes" ? "active" : "")"
+                   asp-controller="Configuracao" asp-action="Index">
+                    <span class="icon"><i class="fas fa-cog"></i></span>
+                    Configurações
+                </a>
+            }
         </nav>
 
         <div class="sidebar-footer">

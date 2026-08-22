@@ -8,11 +8,13 @@ namespace REPOSITORY.Mapeadores.Configuracao
         private readonly FirestoreDb _firestoreDb = firestoreDb;
 
         private const string NomeColecao = "configuracoes";
-        private const string IdDocumentoUnico = "geral";
 
-        public async Task<ConfiguracaoModel?> ObterAsync()
+        public async Task<ConfiguracaoModel?> ObterAsync(string supermercadoId)
         {
-            DocumentReference docRef = _firestoreDb.Collection(NomeColecao).Document(IdDocumentoUnico);
+            if (string.IsNullOrEmpty(supermercadoId))
+                return null;
+
+            DocumentReference docRef = _firestoreDb.Collection(NomeColecao).Document(supermercadoId);
             DocumentSnapshot snapshot = await docRef.GetSnapshotAsync();
 
             if (!snapshot.Exists)
@@ -25,7 +27,10 @@ namespace REPOSITORY.Mapeadores.Configuracao
 
         public async Task SalvarAsync(ConfiguracaoModel configuracao)
         {
-            DocumentReference docRef = _firestoreDb.Collection(NomeColecao).Document(IdDocumentoUnico);
+            if (string.IsNullOrEmpty(configuracao.SupermercadoId))
+                throw new ArgumentException("Não é possível salvar configurações sem um supermercado associado.");
+
+            DocumentReference docRef = _firestoreDb.Collection(NomeColecao).Document(configuracao.SupermercadoId);
             await docRef.SetAsync(configuracao, SetOptions.MergeAll);
         }
     }

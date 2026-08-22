@@ -55,15 +55,15 @@ namespace SERVICE.Fachada
             await _produtoProcesso.DeletarProduto(produto);
         }
 
-        public async Task<List<ProdutoModel>> ListarProdutos()
-        {  
-            return await _produtoProcesso.ListarProdutos();
+        public async Task<List<ProdutoModel>> ListarProdutos(string supermercadoId)
+        {
+            return await _produtoProcesso.ListarProdutos(supermercadoId);
         }
 
-        public async Task<ProdutoModel?> ListarProdutoPorId(string id)
-        {           
+        public async Task<ProdutoModel?> ListarProdutoPorId(string id, string supermercadoId)
+        {
             if (string.IsNullOrEmpty(id)) return null;
-            return await _produtoProcesso.ListarProdutoPorId(id);
+            return await _produtoProcesso.ListarProdutoPorId(id, supermercadoId);
         }
     }
 }

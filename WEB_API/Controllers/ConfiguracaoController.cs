@@ -13,9 +13,9 @@ namespace WEB_API.Controllers
         private readonly ILogger<ConfiguracaoController> _logger = logger;
 
         [HttpGet]
-        public async Task<IActionResult> Get()
+        public async Task<IActionResult> Get([FromQuery] string supermercadoId)
         {
-            var configuracao = await _configuracaoFachada.ObterConfiguracao();
+            var configuracao = await _configuracaoFachada.ObterConfiguracao(supermercadoId);
             return Ok(configuracao);
         }
 
