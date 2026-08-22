@@ -180,15 +180,6 @@
 
         .topbar-icon-btn:hover { background: var(--vermelho-light); color: var(--vermelho); }
 
-        .notif-dot {
-            position: absolute;
-            top: 6px; right: 6px;
-            width: 8px; height: 8px;
-            background: var(--vermelho);
-            border-radius: 50%;
-            border: 2px solid white;
-        }
-
         #main-content {
             margin-left: var(--sidebar-width);
             padding-top: var(--topbar-height);
@@ -453,10 +444,6 @@
             <div class="topbar-subtitle">@(ViewData["PageSubtitle"] ?? "Painel de controle IValid")</div>
         </div>
         <div class="topbar-actions">
-            <button class="topbar-icon-btn" title="Notificações">
-                <i class="fas fa-bell"></i>
-                <span class="notif-dot"></span>
-            </button>
             <div class="user-avatar">
                 @(User.Identity?.Name?.Substring(0, 1).ToUpper() ?? "A")
             </div>
