@@ -11,14 +11,14 @@ Este documento descreve a visão geral do sistema e sua arquitetura técnica.
 - [Arquitetura](#arquitetura)
 - [Camadas do sistema](#camadas-do-sistema)
 - [Comunicação entre WEB e WEB_API](#comunicação-entre-web-e-web_api)
-- [Multi-tenancy: um login por supermercado](#multi-tenancy-um-login-por-supermercado)
+- [Multiloja: um login por supermercado](#multiloja-um-login-por-supermercado)
 - [Autenticação e segurança](#autenticação-e-segurança)
 - [Modelo de dados (Firestore)](#modelo-de-dados-firestore)
 - [Estrutura de pastas](#estrutura-de-pastas)
 
 ## Visão geral
 
-O IValid é um painel administrativo web multi-tenant voltado para supermercados: cada supermercado cadastrado tem seus próprios produtos, funcionários e configurações, completamente isolados dos demais. O sistema permite cadastrar produtos com preço, quantidade em estoque e data de vencimento, e calcula automaticamente:
+O IValid é um painel administrativo web multiloja voltado para supermercados: cada supermercado cadastrado tem seus próprios produtos, funcionários e configurações, completamente isolados dos demais. O sistema permite cadastrar produtos com preço, quantidade em estoque e data de vencimento, e calcula automaticamente:
 
 - o status de validade do produto (crítico, em atenção, na validade ou vencido);
 - o percentual de desconto sugerido para cada status;
@@ -100,11 +100,11 @@ A `WEB` se comunica com a `WEB_API` exclusivamente via HTTP, usando um `HttpClie
 
 Esse mecanismo existe porque a `WEB_API` não foi desenhada para ser pública: ela é de uso exclusivo do próprio sistema (hoje, só a `WEB`; no futuro, potencialmente também um app mobile).
 
-Como o sistema é multi-tenant, praticamente toda chamada da `WEB` para a `WEB_API` sobre produtos, pedidos, configurações e funcionários inclui o `supermercadoId` do usuário logado como query string, extraído da claim `SupermercadoId` do cookie de autenticação. A `WEB_API` usa esse valor para filtrar e validar a posse de cada recurso antes de retorná-lo ou alterá-lo.
+Como o sistema é multiloja, praticamente toda chamada da `WEB` para a `WEB_API` sobre produtos, pedidos, configurações e funcionários inclui o `supermercadoId` do usuário logado como query string, extraído da claim `SupermercadoId` do cookie de autenticação. A `WEB_API` usa esse valor para filtrar e validar a posse de cada recurso antes de retorná-lo ou alterá-lo.
 
-## Multi-tenancy: um login por supermercado
+## Multiloja: um login por supermercado
 
-Cada supermercado cadastrado é um tenant isolado, identificado por um **Código de Acesso** único (gerado automaticamente a partir do nome da loja no momento do cadastro, com um sufixo numérico caso já exista outro igual). Um mesmo proprietário com duas lojas físicas cria duas contas distintas — uma por supermercado — cada uma com seu próprio código.
+Cada supermercado cadastrado é uma loja isolada dentro do sistema, identificada por um **Código de Acesso** único (gerado automaticamente a partir do nome da loja no momento do cadastro, com um sufixo numérico caso já exista outro igual). Um mesmo proprietário com duas lojas físicas cria duas contas distintas — uma por supermercado — cada uma com seu próprio código.
 
 O login é feito em duas etapas, na mesma tela:
 
@@ -137,7 +137,7 @@ Segredos (chave de API interna, credencial de acesso ao Firebase, credenciais de
 
 O Firestore é usado como banco de dados NoSQL, com as seguintes coleções principais:
 
-- **supermercados** — um documento por loja cadastrada (nome, CNPJ, endereço, código de acesso único). É o tenant do sistema.
+- **supermercados** — um documento por loja cadastrada (nome, CNPJ, endereço, código de acesso único). É a unidade de isolamento (a "loja") do sistema.
 - **produtos** — um documento por produto cadastrado (nome, preço, quantidade, data de vencimento, status calculado, percentual de desconto, preço promocional, imagem, `supermercadoId`).
 - **users** — um documento por Administrador cadastrado, com `supermercadoId` vinculando-o à sua loja.
 - **funcionarios** — um documento por funcionário cadastrado por um Administrador, com nome, hash de senha, perfil (Gerente/Operador de Estoque/Atendente), situação (ativo/inativo) e `supermercadoId`.
