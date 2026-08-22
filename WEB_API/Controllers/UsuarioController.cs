@@ -61,7 +61,6 @@ namespace WEB_API.Controllers
             }
             catch (Exception ex)
             {
-          
                 _logger.LogError(ex, "Erro inesperado no login do usuário {Email}", login?.Email);
                 return BadRequest(new ExcecaoDetalhes { Codigo = CodigoExcecao.Generico, InformacaoAdicional = "Ocorreu um erro inesperado ao tentar autenticar. Tente novamente mais tarde." });
             }
@@ -76,7 +75,7 @@ namespace WEB_API.Controllers
                 {
                     return BadRequest(new ExcecaoDetalhes { Codigo = CodigoExcecao.ValidacaoSeguranca, InformacaoAdicional = "Dados inválidos." });
                 }
-  
+
                 if (string.IsNullOrEmpty(_codigoConviteAdmin) || registro.CodigoConvite != _codigoConviteAdmin)
                 {
                     return BadRequest(new ExcecaoDetalhes { Codigo = CodigoExcecao.NaoAutorizado, InformacaoAdicional = "Código de convite de administrador inválido." });
@@ -184,7 +183,6 @@ namespace WEB_API.Controllers
             }
             catch
             {
-                // Corpo não veio no formato esperado; seguimos com null e caímos na mensagem genérica.
             }
 
             return null;

@@ -29,6 +29,11 @@ builder.Services.AddScoped<REPOSITORY.Mapeadores.Usuario.IUsuarioMapeador, REPOS
 builder.Services.AddScoped<UsuarioProcesso>();
 builder.Services.AddScoped<UsuarioFachada>();
 
+builder.Services.AddScoped<REPOSITORY.Mapeadores.Configuracao.IConfiguracaoMapeador, REPOSITORY.Mapeadores.Configuracao.ConfiguracaoMapeador>();
+builder.Services.AddScoped<ConfiguracaoProcesso>();
+builder.Services.AddScoped<ConfiguracaoFachada>();
+builder.Services.AddScoped<DOMAIN.Validador.Configuracao.ConfiguracaoValidacao>();
+
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();

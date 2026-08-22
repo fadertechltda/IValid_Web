@@ -9,8 +9,6 @@ using System.Text.Json;
 
 namespace WEB.Controllers
 {
-    // Esta é a única entrada pública do painel: todo o resto exige login,
-    // por causa do AuthorizeFilter global registrado em Program.cs.
     [AllowAnonymous]
     public class AutenticacaoController(IHttpClientFactory httpClientFactory, ILogger<AutenticacaoController> logger) : Controller
     {
@@ -74,7 +72,6 @@ namespace WEB.Controllers
                         return RedirectToAction("Index", "Home");
                     }
 
-                    // A API respondeu 2xx mas não veio um usuário reconhecível: trata como erro.
                     ModelState.AddModelError(string.Empty, "Não foi possível processar a resposta do servidor.");
                     return View(modeloLogin);
                 }
@@ -84,8 +81,6 @@ namespace WEB.Controllers
             }
             catch (Exception ex)
             {
-                // Detalhe completo só no log do servidor; o usuário recebe uma mensagem genérica,
-                // para não expor detalhes internos (ex: motivo de falha de conexão com a API).
                 _logger.LogError(ex, "Erro de conexão com a API ao tentar autenticar {Email}", modeloLogin.Email);
                 ModelState.AddModelError(string.Empty, "Não foi possível conectar ao servidor. Tente novamente em instantes.");
             }
@@ -163,9 +158,6 @@ namespace WEB.Controllers
                 _logger.LogError(ex, "Erro de conexão com a API ao solicitar redefinição de senha para {Email}", modelo.Email);
             }
 
-            // Mensagem sempre igual, mesmo em caso de falha: não confirmamos nem negamos
-            // se o email existe no sistema (evita que alguém use esta tela para descobrir
-            // quais contas existem).
             TempData["Sucesso"] = "Se o email informado estiver cadastrado, você receberá um link para redefinir sua senha.";
             return RedirectToAction("Login");
         }

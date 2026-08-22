@@ -1,0 +1,86 @@
+@model DOMAIN.Model.Configuracao.ConfiguracaoModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Configurações";
+    ViewData["ActivePage"] = "Configuracoes";
+    ViewData["PageTitle"] = "Configurações";
+    ViewData["PageSubtitle"] = "Regras de alerta e desconto por proximidade de vencimento.";
+}
+
+@if (!ViewData.ModelState.IsValid)
+{
+    <div class="alert-admin danger mb-4">
+        <i class="fas fa-exclamation-circle"></i>
+        <div>@Html.ValidationSummary(false, "", new { @class = "mb-0 list-unstyled p-0 m-0" })</div>
+    </div>
+}
+
+<div class="admin-card mb-4">
+    <div class="admin-card-header">
+        <h5 class="admin-card-title">
+            <i class="fas fa-traffic-light me-2" style="color:var(--amarelo)"></i>
+            Regras de validade e desconto
+        </h5>
+    </div>
+    <div class="p-4">
+        <p class="text-muted mb-4" style="font-size:13px;">
+            Essas regras definem quando um produto entra em alerta amarelo ou vermelho na listagem,
+            e qual desconto o sistema sugere automaticamente para cada faixa de dias restantes até o vencimento.
+        </p>
+
+        <form asp-controller="Configuracao" asp-action="Index" method="post">
+            <div class="row g-4">
+                <div class="col-md-6">
+                    <div class="admin-card h-100" style="border-color:#ffe8b3;">
+                        <div class="admin-card-header" style="background:var(--amarelo-light); border-bottom:none;">
+                            <span class="badge-amarelo">Alerta Amarelo</span>
+                        </div>
+                        <div class="p-3">
+                            <label asp-for="DiasAlertaAmarelo" class="form-label-custom">Dias antes do vencimento</label>
+                            <input asp-for="DiasAlertaAmarelo" type="number" min="0" class="form-control form-control-custom mb-3" />
+                            <span asp-validation-for="DiasAlertaAmarelo" class="text-danger" style="font-size:12px;"></span>
+
+                            <label asp-for="PercentualDescontoAmarelo" class="form-label-custom">Desconto sugerido (%)</label>
+                            <input asp-for="PercentualDescontoAmarelo" type="number" min="0" max="100" class="form-control form-control-custom" />
+                            <span asp-validation-for="PercentualDescontoAmarelo" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="admin-card h-100" style="border-color:#ffcdd2;">
+                        <div class="admin-card-header" style="background:var(--vermelho-light); border-bottom:none;">
+                            <span class="badge-vermelho">Alerta Vermelho</span>
+                        </div>
+                        <div class="p-3">
+                            <label asp-for="DiasAlertaVermelho" class="form-label-custom">Dias antes do vencimento</label>
+                            <input asp-for="DiasAlertaVermelho" type="number" min="0" class="form-control form-control-custom mb-3" />
+                            <span asp-validation-for="DiasAlertaVermelho" class="text-danger" style="font-size:12px;"></span>
+
+                            <label asp-for="PercentualDescontoVermelho" class="form-label-custom">Desconto sugerido (%)</label>
+                            <input asp-for="PercentualDescontoVermelho" type="number" min="0" max="100" class="form-control form-control-custom" />
+                            <span asp-validation-for="PercentualDescontoVermelho" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="mt-4 d-flex align-items-start gap-2" style="font-size:12px; color:var(--text-muted-custom);">
+                <i class="fas fa-info-circle mt-1"></i>
+                <span>
+                    O alerta amarelo dispara primeiro, então o número de dias dele deve ser maior que o do alerta vermelho.
+                    Um produto entra em VERMELHO quando faltam @Model.DiasAlertaVermelho dia(s) ou menos para vencer,
+                    e em AMARELO quando faltam @Model.DiasAlertaAmarelo dia(s) ou menos (e mais que @Model.DiasAlertaVermelho).
+                </span>
+            </div>
+
+            <button type="submit" class="btn btn-danger-custom mt-4">
+                <i class="fas fa-save me-2"></i>Salvar Configurações
+            </button>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

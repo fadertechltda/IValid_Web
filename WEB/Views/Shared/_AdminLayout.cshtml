@@ -422,7 +422,8 @@
             </a>
 
             <div class="nav-section-title">Sistema</div>
-            <a class="sidebar-link" href="#">
+            <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Configuracoes" ? "active" : "")"
+               asp-controller="Configuracao" asp-action="Index">
                 <span class="icon"><i class="fas fa-cog"></i></span>
                 Configurações
             </a>

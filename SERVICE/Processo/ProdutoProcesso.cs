@@ -1,26 +1,28 @@
 using DOMAIN.Model.Produto;
+using DOMAIN.Model.Configuracao;
 using REPOSITORY.Mapeadores.Produto;
 
 namespace SERVICE.Processo
 {
-    public class ProdutoProcesso(IProdutoMapeador produtoMapeador)
+    public class ProdutoProcesso(IProdutoMapeador produtoMapeador, ConfiguracaoProcesso configuracaoProcesso)
     {
         private readonly IProdutoMapeador _produtoMapeador = produtoMapeador;
+        private readonly ConfiguracaoProcesso _configuracaoProcesso = configuracaoProcesso;
 
         public async Task CadastrarProduto(ProdutoModel produto)
         {
-            CalcularStatusEPrecos(produto);
+            await CalcularStatusEPrecosAsync(produto);
             await _produtoMapeador.CadastrarAsync(produto);
         }
 
         public async Task AtualizarProduto(ProdutoModel produto)
         {
-            CalcularStatusEPrecos(produto);
+            await CalcularStatusEPrecosAsync(produto);
             await _produtoMapeador.AtualizarAsync(produto);
         }
 
         public async Task DeletarProduto(ProdutoModel produto)
-        {           
+        {
             await _produtoMapeador.DeletarAsync(produto);
         }
 
@@ -28,9 +30,11 @@ namespace SERVICE.Processo
         {
             var listaDeProdutos = await _produtoMapeador.ListarTodosAsync();
 
-            foreach(var produto in listaDeProdutos)
+            var configuracao = await _configuracaoProcesso.ObterConfiguracao();
+
+            foreach (var produto in listaDeProdutos)
             {
-                CalcularStatusEPrecos(produto);
+                AplicarRegras(produto, configuracao);
             }
 
             return listaDeProdutos;
@@ -42,28 +46,34 @@ namespace SERVICE.Processo
 
             if (produto != null)
             {
-                CalcularStatusEPrecos(produto);
+                await CalcularStatusEPrecosAsync(produto);
             }
 
             return produto;
         }
 
-        public void CalcularStatusEPrecos(ProdutoModel produto)
+        public async Task CalcularStatusEPrecosAsync(ProdutoModel produto)
         {
-            int diasParaVencer = (produto.DataVencimento.Date - DateTime.UtcNow.Date).Days;   
+            var configuracao = await _configuracaoProcesso.ObterConfiguracao();
+            AplicarRegras(produto, configuracao);
+        }
+
+        private static void AplicarRegras(ProdutoModel produto, ConfiguracaoModel configuracao)
+        {
+            int diasParaVencer = (produto.DataVencimento.Date - DateTime.UtcNow.Date).Days;
             produto.DiaValidade = diasParaVencer > 0 ? diasParaVencer : 0;
 
-            if (diasParaVencer <= 10)
+            if (diasParaVencer <= configuracao.DiasAlertaVermelho)
             {
                 produto.Status = "VERMELHO";
-                produto.DescricaoPorcentual = 40;
-                produto.PrecoPromocao = produto.Preco * 0.50;
+                produto.DescricaoPorcentual = configuracao.PercentualDescontoVermelho;
+                produto.PrecoPromocao = CalcularPrecoComDesconto(produto.Preco, configuracao.PercentualDescontoVermelho);
             }
-            else if (diasParaVencer <= 20)
+            else if (diasParaVencer <= configuracao.DiasAlertaAmarelo)
             {
                 produto.Status = "AMARELO";
-                produto.DescricaoPorcentual = 20;
-                produto.PrecoPromocao = produto.Preco * 0.80;
+                produto.DescricaoPorcentual = configuracao.PercentualDescontoAmarelo;
+                produto.PrecoPromocao = CalcularPrecoComDesconto(produto.Preco, configuracao.PercentualDescontoAmarelo);
             }
             else
             {
@@ -71,6 +81,11 @@ namespace SERVICE.Processo
                 produto.DescricaoPorcentual = 0;
                 produto.PrecoPromocao = produto.Preco;
             }
+        }
+
+        private static double CalcularPrecoComDesconto(double preco, int percentualDesconto)
+        {
+            return preco * (1 - percentualDesconto / 100.0);
         }
     }
 }

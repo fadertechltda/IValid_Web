@@ -12,7 +12,7 @@ namespace SERVICE.Fachada
         
         public async Task CadastrarProdutos(ProdutoModel produto)
         {
-            _produtoProcesso.CalcularStatusEPrecos(produto);
+            await _produtoProcesso.CalcularStatusEPrecosAsync(produto);
 
             _validador.AssineRegrasInclusao();
 
@@ -28,7 +28,7 @@ namespace SERVICE.Fachada
 
         public async Task AtualizarProdutos(ProdutoModel produto)
         {
-            _produtoProcesso.CalcularStatusEPrecos(produto);
+            await _produtoProcesso.CalcularStatusEPrecosAsync(produto);
 
             _validador.AssineRegrasAtualizacao();
 
