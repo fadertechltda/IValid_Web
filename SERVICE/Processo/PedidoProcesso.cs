@@ -13,7 +13,9 @@ namespace SERVICE.Processo
             var pedidos = await _pedidoMapeador.ListarTodosAsync();
             await PreencherNomesClientes(pedidos);
 
-            return [.. pedidos.OrderByDescending(p => p.DataPedido)];
+            return [.. pedidos
+                .OrderBy(p => StatusPedidoUtil.Prioridade(p.Status))
+                .ThenByDescending(p => p.DataPedido)];
         }
 
         public async Task<PedidoModel?> ListarPedidoPorId(string id)

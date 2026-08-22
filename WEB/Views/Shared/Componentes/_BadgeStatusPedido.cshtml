@@ -1,23 +1,27 @@
+@using DOMAIN.Model.Pedido
 @model string
 
 @{
-    var statusLower = (Model ?? string.Empty).ToLowerInvariant();
+    var statusCanonico = StatusPedidoUtil.Normalizar(Model);
 
-    string classeBadge = statusLower switch
+    string classeBadge = statusCanonico switch
     {
-        "pagamento pix pendente" => "badge-amarelo",
-        "em preparação"          => "badge-amarelo",
-        "entregue"               => "badge-verde",
-        _                        => "badge-vermelho"
+        "PENDENTE" or "CONFIRMADO" or "SEPARADO" or "EM_ROTA" => "badge-amarelo",
+        "FINALIZADO"                                          => "badge-verde",
+        "CANCELADO"                                            => "badge-vermelho",
+        _                                                      => "badge-vermelho"
     };
 
-    string rotuloStatus = statusLower switch
+    string rotuloStatus = statusCanonico switch
     {
-        "pagamento pix pendente" => "Pagamento Pendente",
-        "em preparação"          => "Em Preparação",
-        "entregue"               => "Entregue",
-        _                        => Model ?? "Status Desconhecido"
+        "PENDENTE"   => "PENDENTE",
+        "CONFIRMADO" => "CONFIRMADO",
+        "SEPARADO"   => "SEPARADO",
+        "EM_ROTA"    => "EM ROTA DE ENTREGA",
+        "FINALIZADO" => "FINALIZADO",
+        "CANCELADO"  => "CANCELADO",
+        _            => (Model ?? "STATUS DESCONHECIDO").ToUpperInvariant()
     };
 }
 
-<span class="@classeBadge" style="text-transform:uppercase;">@rotuloStatus</span>
+<span class="@classeBadge">@rotuloStatus</span>
