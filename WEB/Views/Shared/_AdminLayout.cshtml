@@ -16,6 +16,8 @@
             --amarelo-light: #FFF8E1;
             --verde: #2E7D32;
             --verde-light: #E8F5E9;
+            --cinza: #616161;
+            --cinza-light: #EEEEEE;
             --sidebar-bg: #1a1a2e;
             --sidebar-width: 260px;
             --topbar-height: 64px;
@@ -237,6 +239,7 @@
         .stat-card.warning::before { background: linear-gradient(90deg, var(--amarelo), #ffd740); }
         .stat-card.success::before { background: linear-gradient(90deg, var(--verde), #4CAF50); }
         .stat-card.info::before { background: linear-gradient(90deg, #1565C0, #42a5f5); }
+        .stat-card.secondary::before { background: linear-gradient(90deg, var(--cinza), #9e9e9e); }
 
         .stat-icon {
             width: 48px; height: 48px;
@@ -252,6 +255,21 @@
         .stat-icon.warning { background: var(--amarelo-light); color: var(--amarelo); }
         .stat-icon.success { background: var(--verde-light); color: var(--verde); }
         .stat-icon.info { background: #e3f2fd; color: #1565C0; }
+        .stat-icon.secondary { background: var(--cinza-light); color: var(--cinza); }
+
+        .filtro-status {
+            border: 1.5px solid #e8eaef;
+            border-radius: 10px;
+            background: white;
+            color: #555;
+            font-size: 13px;
+            font-weight: 600;
+            padding: 8px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .filtro-status:hover { background: #f4f6fb; }
+        .filtro-status.active { background: var(--sidebar-bg); color: white; border-color: var(--sidebar-bg); }
 
         .stat-value { font-size: 28px; font-weight: 800; color: #1a1a2e; line-height: 1; }
         .stat-label { font-size: 12px; font-weight: 500; color: var(--text-muted-custom); margin-top: 4px; }
@@ -259,10 +277,12 @@
         .badge-vermelho { background: var(--vermelho-light); color: var(--vermelho); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
         .badge-amarelo  { background: var(--amarelo-light); color: #e65100; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
         .badge-verde    { background: var(--verde-light); color: var(--verde); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
+        .badge-vencido  { background: var(--cinza-light); color: var(--cinza); font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; display: inline-flex; align-items: center; gap: 5px; }
 
         .badge-vermelho::before { content: ''; width: 6px; height: 6px; background: var(--vermelho); border-radius: 50%; }
         .badge-amarelo::before  { content: ''; width: 6px; height: 6px; background: var(--amarelo); border-radius: 50%; }
         .badge-verde::before    { content: ''; width: 6px; height: 6px; background: var(--verde); border-radius: 50%; }
+        .badge-vencido::before  { content: ''; width: 6px; height: 6px; background: var(--cinza); border-radius: 50%; }
 
         .admin-table thead th {
             font-size: 11px;
@@ -406,21 +426,6 @@
                 Produtos
             </a>
 
-            <div class="nav-section-title">Alertas</div>
-            <a class="sidebar-link" href="#">
-                <span class="icon"><i class="fas fa-fire" style="color:var(--vermelho)"></i></span>
-                Próx. Vencimento
-                <span class="badge-count">!</span>
-            </a>
-            <a class="sidebar-link" href="#">
-                <span class="icon"><i class="fas fa-exclamation-triangle" style="color:var(--amarelo)"></i></span>
-                Em Promoção
-            </a>
-            <a class="sidebar-link" href="#">
-                <span class="icon"><i class="fas fa-check-circle" style="color:var(--verde)"></i></span>
-                Estoque OK
-            </a>
-
             <div class="nav-section-title">Sistema</div>
             <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Configuracoes" ? "active" : "")"
                asp-controller="Configuracao" asp-action="Index">
@@ -448,9 +453,6 @@
             <div class="topbar-subtitle">@(ViewData["PageSubtitle"] ?? "Painel de controle IValid")</div>
         </div>
         <div class="topbar-actions">
-            <button class="topbar-icon-btn" title="Buscar">
-                <i class="fas fa-search"></i>
-            </button>
             <button class="topbar-icon-btn" title="Notificações">
                 <i class="fas fa-bell"></i>
                 <span class="notif-dot"></span>

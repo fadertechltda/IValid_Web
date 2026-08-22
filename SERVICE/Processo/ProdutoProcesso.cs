@@ -63,7 +63,13 @@ namespace SERVICE.Processo
             int diasParaVencer = (produto.DataVencimento.Date - DateTime.UtcNow.Date).Days;
             produto.DiaValidade = diasParaVencer > 0 ? diasParaVencer : 0;
 
-            if (diasParaVencer <= configuracao.DiasAlertaVermelho)
+            if (diasParaVencer < 0)
+            {
+                produto.Status = "VENCIDO";
+                produto.DescricaoPorcentual = 0;
+                produto.PrecoPromocao = produto.Preco;
+            }
+            else if (diasParaVencer <= configuracao.DiasAlertaVermelho)
             {
                 produto.Status = "VERMELHO";
                 produto.DescricaoPorcentual = configuracao.PercentualDescontoVermelho;

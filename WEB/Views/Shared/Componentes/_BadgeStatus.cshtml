@@ -5,6 +5,7 @@
 
     string classeBadge = statusUpper switch
     {
+        "VENCIDO"  => "badge-vencido",
         "VERMELHO" => "badge-vermelho",
         "AMARELO"  => "badge-amarelo",
         _          => "badge-verde"
@@ -12,6 +13,7 @@
 
     string rotuloStatus = statusUpper switch
     {
+        "VENCIDO"  => "Vencido",
         "VERMELHO" => "Crítico",
         "AMARELO"  => "Atenção",
         _          => "Na Validade"

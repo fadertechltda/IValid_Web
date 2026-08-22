@@ -26,6 +26,14 @@
         </div>
     </div>
 
+    <div class="d-flex gap-2 flex-wrap" style="padding: 18px 24px; border-bottom: 1px solid #eef0f4;">
+        <button type="button" class="filtro-status" data-filtro-status="TODOS" onclick="filtrarPorStatus('TODOS', this)">Todos</button>
+        <button type="button" class="filtro-status" data-filtro-status="VENCIDO" onclick="filtrarPorStatus('VENCIDO', this)">⚫ Vencidos</button>
+        <button type="button" class="filtro-status" data-filtro-status="VERMELHO" onclick="filtrarPorStatus('VERMELHO', this)">🔴 Críticos</button>
+        <button type="button" class="filtro-status" data-filtro-status="AMARELO" onclick="filtrarPorStatus('AMARELO', this)">🟡 Em Atenção</button>
+        <button type="button" class="filtro-status" data-filtro-status="VERDE" onclick="filtrarPorStatus('VERDE', this)">🟢 Na Validade</button>
+    </div>
+
     <div class="table-responsive">
         @if (Model == null || !Model.Any())
         {
@@ -55,7 +63,18 @@
                 <tbody>
                     @foreach (var produto in Model)
                     {
-                        <tr data-status="@produto.Status?.ToUpper()">
+                        var statusUpper = produto.Status?.ToUpper() ?? "VERDE";
+                        var vencido = statusUpper == "VENCIDO";
+                        var diasRestantes = (produto.DataVencimento.Date - DateTime.Now.Date).Days;
+                        var corDias = statusUpper switch
+                        {
+                            "VENCIDO" => "var(--cinza)",
+                            "VERMELHO" => "var(--vermelho)",
+                            "AMARELO" => "var(--amarelo)",
+                            _ => "var(--verde)"
+                        };
+
+                        <tr data-status="@statusUpper" class="@(vencido ? "opacity-75" : "")">
                             <td>
                                 <div class="d-flex align-items-center gap-3">
                                     @{ ViewData["Tamanho"] = "P"; }
@@ -71,7 +90,7 @@
                                 @await Html.PartialAsync("~/Views/Shared/Componentes/_BadgeStatus.cshtml", produto.Status)
                             </td>
                             <td style="font-weight:600;">R$ @produto.Preco.ToString("F2")</td>
-                            <td style="color:var(--vermelho); font-weight:700;">R$ @produto.PrecoPromocao.ToString("F2")</td>
+                            <td style="color:@(vencido ? "#aaa" : "var(--vermelho)"); font-weight:700;">R$ @produto.PrecoPromocao.ToString("F2")</td>
                             <td>
                                 <span style="background:#f0f2f6; padding:3px 10px; border-radius:20px; font-size:12px; font-weight:700; color:#555;">
                                     @produto.DescricaoPorcentual%
@@ -79,14 +98,19 @@
                             </td>
                             <td>@produto.Quantidade</td>
                             <td>
-                                @{
-                                    var diasRestantes = (produto.DataVencimento - DateTime.Now.Date).Days;
-                                    string corDias = diasRestantes <= 10 ? "var(--vermelho)" : diasRestantes <= 20 ? "var(--amarelo)" : "var(--verde)";
-                                }
                                 <div style="font-size:12px; font-weight:600; color:@corDias;">
                                     @produto.DataVencimento.ToString("dd/MM/yyyy")
                                 </div>
-                                <div style="font-size:11px; color:#aaa;">@diasRestantes dias restantes</div>
+                                <div style="font-size:11px; color:#aaa;">
+                                    @if (vencido)
+                                    {
+                                        @($"vencido há {Math.Abs(diasRestantes)} dia(s)")
+                                    }
+                                    else
+                                    {
+                                        @($"{diasRestantes} dia(s) restantes")
+                                    }
+                                </div>
                             </td>
                             <td>
                                 <div class="d-flex gap-1 justify-content-center">
@@ -110,16 +134,38 @@
 
 @section Scripts {
 <script>
+    let statusAtivo = 'TODOS';
+
     function removerAcentos(texto) {
         return texto.normalize('NFD').replace(/[\u0300-\u036f]/g, "");
+    }
+
+    function filtrarPorStatus(status, botao) {
+        statusAtivo = status;
+        document.querySelectorAll('.filtro-status').forEach(b => b.classList.remove('active'));
+        botao.classList.add('active');
+        filtrarTabela();
     }
 
     function filtrarTabela() {
         const termoBusca = removerAcentos(document.getElementById('campoBusca').value.toLowerCase());
         document.querySelectorAll('#tabelaProdutos tbody tr').forEach(linha => {
             const textoLinha = removerAcentos(linha.textContent.toLowerCase());
-            linha.style.display = textoLinha.includes(termoBusca) ? '' : 'none';
+            const statusLinha = linha.getAttribute('data-status');
+            const passaBusca = textoLinha.includes(termoBusca);
+            const passaStatus = statusAtivo === 'TODOS' || statusLinha === statusAtivo;
+            linha.style.display = (passaBusca && passaStatus) ? '' : 'none';
         });
     }
+
+    (function inicializarFiltroPelaUrl() {
+        const statusNaUrl = new URLSearchParams(window.location.search).get('status');
+        const botaoCorrespondente = statusNaUrl
+            ? document.querySelector(`.filtro-status[data-filtro-status="${statusNaUrl.toUpperCase()}"]`)
+            : null;
+
+        const botaoInicial = botaoCorrespondente ?? document.querySelector('.filtro-status[data-filtro-status="TODOS"]');
+        filtrarPorStatus(botaoInicial.getAttribute('data-filtro-status'), botaoInicial);
+    })();
 </script>
 }
