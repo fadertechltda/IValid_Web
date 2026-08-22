@@ -1,27 +1,23 @@
 @model string
 
 @{
-    var statusUpper = (Model ?? string.Empty).ToUpper();
+    var statusLower = (Model ?? string.Empty).ToLowerInvariant();
 
-    string classeBadge = statusUpper switch
+    string classeBadge = statusLower switch
     {
-        "PENDENTE"   => "badge-amarelo",
-        "EM_PREPARO" => "badge-esgotado",
-        "PRONTO"     => "badge-verde",
-        "CONCLUIDO"  => "badge-verde",
-        "CANCELADO"  => "badge-vermelho",
-        _            => "badge-amarelo"
+        "pagamento pix pendente" => "badge-amarelo",
+        "em preparação"          => "badge-amarelo",
+        "entregue"               => "badge-verde",
+        _                        => "badge-vermelho"
     };
 
-    string rotuloStatus = statusUpper switch
+    string rotuloStatus = statusLower switch
     {
-        "PENDENTE"   => "Pendente",
-        "EM_PREPARO" => "Em Preparo",
-        "PRONTO"     => "Pronto",
-        "CONCLUIDO"  => "Concluído",
-        "CANCELADO"  => "Cancelado",
-        _            => "Pendente"
+        "pagamento pix pendente" => "Pagamento Pendente",
+        "em preparação"          => "Em Preparação",
+        "entregue"               => "Entregue",
+        _                        => Model ?? "Status Desconhecido"
     };
 }
 
-<span class="@classeBadge">@rotuloStatus</span>
+<span class="@classeBadge" style="text-transform:uppercase;">@rotuloStatus</span>
