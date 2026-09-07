@@ -16,6 +16,11 @@ namespace DOMAIN.Validador.Produto
                 .GreaterThan(0)
                 .WithMessage("O valor do produto deve ser maior que 0.");
 
+            RuleFor(produto => produto.PrecoCusto)
+                .GreaterThanOrEqualTo(0)
+                .When(produto => produto.PrecoCusto.HasValue)
+                .WithMessage("O preço de custo não pode ser negativo.");
+
             RuleFor(produto => produto.DataVencimento)
                 .GreaterThanOrEqualTo(DateTime.Today)
                 .WithMessage("O produto já está vencido no momento do cadastro.");
@@ -46,6 +51,11 @@ namespace DOMAIN.Validador.Produto
             RuleFor(produto => produto.Preco)
                 .GreaterThan(0)
                 .WithMessage("O valor do produto deve ser maior que 0.");
+
+            RuleFor(produto => produto.PrecoCusto)
+                .GreaterThanOrEqualTo(0)
+                .When(produto => produto.PrecoCusto.HasValue)
+                .WithMessage("O preço de custo não pode ser negativo.");
 
             RuleFor(produto => produto.DataVencimento)
                 .GreaterThanOrEqualTo(DateTime.Today)

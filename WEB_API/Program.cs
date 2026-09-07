@@ -61,6 +61,9 @@ builder.Services.AddScoped<IPedidoMapeador, PedidoMapeador>();
 builder.Services.AddScoped<PedidoProcesso>();
 builder.Services.AddScoped<PedidoFachada>();
 
+builder.Services.AddScoped<DashboardProcesso>();
+builder.Services.AddScoped<DashboardFachada>();
+
 builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();

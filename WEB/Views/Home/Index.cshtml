@@ -1,24 +1,166 @@
+@using DOMAIN.Model.Dashboard
+@model DashboardModel
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Dashboard";
     ViewData["ActivePage"] = "Dashboard";
     ViewData["PageTitle"] = "Visão Geral";
     ViewData["PageSubtitle"] = "Acompanhe as métricas e alertas da sua loja.";
+
+    bool podeVerProdutos = User.IsInRole("Administrador") || User.IsInRole("Gerente") || User.IsInRole("OperadorEstoque");
+    bool podeVerFinanceiro = User.IsInRole("Administrador") || User.IsInRole("Gerente");
 }
 
-<div class="row">
-    <div class="col-12 text-center mt-5 pt-5">
-        <div class="display-1 text-muted mb-4" style="opacity: 0.2;">
-            <i class="fas fa-chart-line"></i>
+<div class="row row-cols-2 row-cols-xl-6 g-3 mb-4">
+    <div class="col">
+        <div class="stat-card secondary">
+            <div class="stat-label"><i class="fas fa-skull-crossbones"></i> Vencidos</div>
+            <div class="stat-value">@Model.TotalVencido</div>
         </div>
-        <h3 class="text-secondary fw-bold">Bem-vindo ao Painel Administrativo!</h3>
-        <p class="text-muted">A tela de relatórios e métricas avançadas será implementada nas próximas fases.</p>
-        
-        @if (User.IsInRole("Administrador") || User.IsInRole("Gerente") || User.IsInRole("OperadorEstoque"))
-        {
-            <a asp-controller="Produto" asp-action="Index" class="btn btn-danger-custom mt-3">
-                <i class="fas fa-box-open ms-1"></i> Ir para Produtos
-            </a>
-        }
+    </div>
+    <div class="col">
+        <div class="stat-card danger">
+            <div class="stat-label"><i class="fas fa-fire"></i> Críticos</div>
+            <div class="stat-value">@Model.TotalVermelho</div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="stat-card warning">
+            <div class="stat-label"><i class="fas fa-exclamation-triangle"></i> Em Atenção</div>
+            <div class="stat-value">@Model.TotalAmarelo</div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="stat-card success">
+            <div class="stat-label"><i class="fas fa-check-circle"></i> Na Validade</div>
+            <div class="stat-value">@Model.TotalVerde</div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="stat-card esgotado">
+            <div class="stat-label"><i class="fas fa-dolly"></i> Sem Estoque</div>
+            <div class="stat-value">@Model.TotalEsgotado</div>
+        </div>
+    </div>
+    <div class="col">
+        <div class="stat-card info">
+            <div class="stat-label"><i class="fas fa-boxes"></i> Total de Produtos</div>
+            <div class="stat-value">@Model.TotalProdutos</div>
+        </div>
     </div>
 </div>
+
+@if (podeVerFinanceiro)
+{
+    <div class="row row-cols-1 row-cols-md-3 g-3 mb-4">
+        <div class="col">
+            <div class="stat-card danger">
+                <div class="stat-label"><i class="fas fa-triangle-exclamation"></i> Valor em Risco</div>
+                <div class="stat-value">R$ @Model.ValorEmRisco.ToString("N2")</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="stat-card info">
+                <div class="stat-label"><i class="fas fa-cash-register"></i> Faturamento (pedidos entregues)</div>
+                <div class="stat-value">R$ @Model.FaturamentoTotal.ToString("N2")</div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="stat-card success">
+                <div class="stat-label"><i class="fas fa-sack-dollar"></i> Lucro (pedidos entregues)</div>
+                <div class="stat-value">R$ @Model.LucroTotal.ToString("N2")</div>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.LucroIncompleto)
+    {
+        <div class="mb-4 d-flex align-items-start gap-2" style="background:var(--amarelo-light); color:#e65100; border-radius:10px; padding:12px 16px; font-size:13px;">
+            <i class="fas fa-info-circle mt-1"></i>
+            <span>
+                O lucro exibido é parcial: alguns produtos vendidos em pedidos entregues ainda não têm o preço de custo cadastrado,
+                então a contribuição deles não entrou nessa conta. Preencha o "Preço de Custo" no cadastro de cada produto para um número completo.
+            </span>
+        </div>
+    }
+}
+
+<div class="admin-card mb-4">
+    <div class="admin-card-header">
+        <h5 class="admin-card-title">
+            <i class="fas fa-hourglass-half me-2" style="color:var(--vermelho)"></i>
+            Produtos mais urgentes
+        </h5>
+    </div>
+
+    @if (Model.ProdutosUrgentes.Count == 0)
+    {
+        <div class="text-center py-5">
+            <i class="fas fa-circle-check" style="font-size:40px; color:#ddd;"></i>
+            <p class="mt-3" style="color:#aaa; font-size:14px;">Nenhum produto próximo do vencimento no momento.</p>
+        </div>
+    }
+    else
+    {
+        <div class="table-responsive">
+            <table class="table admin-table mb-0">
+                <thead>
+                    <tr>
+                        <th>Produto</th>
+                        <th>Status</th>
+                        <th>Vencimento</th>
+                        <th>Qtd.</th>
+                        @if (podeVerProdutos)
+                        {
+                            <th style="text-align:center">Ações</th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var produto in Model.ProdutosUrgentes)
+                    {
+                        var diasRestantes = (produto.DataVencimento.Date - DateTime.Now.Date).Days;
+
+                        <tr>
+                            <td>
+                                <div class="d-flex align-items-center gap-3">
+                                    @{ ViewData["Tamanho"] = "P"; }
+                                    @await Html.PartialAsync("~/Views/Shared/Componentes/_ImagemProduto.cshtml", produto.UrlImagem)
+                                    <div style="font-weight:600;font-size:13px;color:#1a1a2e;">@produto.Nome</div>
+                                </div>
+                            </td>
+                            <td>
+                                @await Html.PartialAsync("~/Views/Shared/Componentes/_BadgeStatus.cshtml", produto.Status)
+                            </td>
+                            <td>
+                                <div style="font-size:12px; font-weight:600;">@produto.DataVencimento.ToString("dd/MM/yyyy")</div>
+                                <div style="font-size:11px; color:#aaa;">@diasRestantes dia(s) restantes</div>
+                            </td>
+                            <td>@produto.Quantidade</td>
+                            @if (podeVerProdutos)
+                            {
+                                <td style="text-align:center">
+                                    <a asp-controller="Produto" asp-action="Edit" asp-route-id="@produto.Id" class="btn-icon edit" title="Editar">
+                                        <i class="fas fa-pen"></i>
+                                    </a>
+                                </td>
+                            }
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
+
+@if (podeVerProdutos)
+{
+    <div class="d-flex gap-2 flex-wrap mb-4">
+        <a asp-controller="Produto" asp-action="Create" class="btn btn-danger-custom">
+            <i class="fas fa-plus me-1"></i> Cadastrar Produto
+        </a>
+        <a asp-controller="Produto" asp-action="Index" asp-route-status="VERMELHO" class="btn-outline-custom" style="text-decoration:none;">
+            <i class="fas fa-fire me-1"></i> Ver Críticos
+        </a>
+    </div>
+}

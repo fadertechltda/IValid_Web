@@ -27,17 +27,17 @@
             <div class="col-sm-4">
                 <span style="display:inline-block; width:10px; height:10px;
                              background:var(--vermelho); border-radius:50%; margin-right:4px;"></span>
-                <strong>Crítico</strong> ≤ @configuracao.DiasAlertaVermelho dias → @configuracao.PercentualDescontoVermelho% OFF
+                <strong>Crítico</strong> ≤ @ConfiguracaoModel.DiasLimiteVermelho dias → @configuracao.PercentualDescontoVermelho% OFF
             </div>
             <div class="col-sm-4">
                 <span style="display:inline-block; width:10px; height:10px;
                              background:var(--amarelo); border-radius:50%; margin-right:4px;"></span>
-                <strong>Em Atenção</strong> ≤ @configuracao.DiasAlertaAmarelo dias → @configuracao.PercentualDescontoAmarelo% OFF
+                <strong>Em Atenção</strong> ≤ @ConfiguracaoModel.DiasLimiteAmarelo dias → @configuracao.PercentualDescontoAmarelo% OFF
             </div>
             <div class="col-sm-4">
                 <span style="display:inline-block; width:10px; height:10px;
                              background:var(--verde); border-radius:50%; margin-right:4px;"></span>
-                <strong>Na Validade</strong> &gt; @configuracao.DiasAlertaAmarelo dias → sem desconto
+                <strong>Na Validade</strong> &gt; @ConfiguracaoModel.DiasLimiteAmarelo dias → sem desconto
             </div>
         </div>
 

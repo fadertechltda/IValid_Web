@@ -42,7 +42,7 @@
                             <span asp-validation-for="Nome" class="text-danger" style="font-size:12px;"></span>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-4">
                             <label class="form-label-custom">Preço Original (R$) *</label>
                             <div class="input-group">
                                 <span class="input-group-text" style="border-radius:10px 0 0 10px; border:1.5px solid #e8eaef; background:#f8f9fc; font-size:13px; border-right:none;">R$</span>
@@ -54,7 +54,19 @@
                             <span asp-validation-for="Preco" class="text-danger" style="font-size:12px;"></span>
                         </div>
 
-                        <div class="col-md-6">
+                        <div class="col-md-4">
+                            <label class="form-label-custom">Preço de Custo (R$)</label>
+                            <div class="input-group">
+                                <span class="input-group-text" style="border-radius:10px 0 0 10px; border:1.5px solid #e8eaef; background:#f8f9fc; font-size:13px; border-right:none;">R$</span>
+                                <input asp-for="PrecoCusto" type="number" step="0.01" min="0"
+                                       class="form-control form-control-custom"
+                                       style="border-left:none; border-radius:0 10px 10px 0;"
+                                       placeholder="0,00" />
+                            </div>
+                            <span asp-validation-for="PrecoCusto" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+
+                        <div class="col-md-4">
                             <label class="form-label-custom">Quantidade em Estoque *</label>
                             <input asp-for="Quantidade" type="number" min="0"
                                    class="form-control form-control-custom w-100" placeholder="0" />

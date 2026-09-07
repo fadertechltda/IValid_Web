@@ -74,13 +74,13 @@ namespace SERVICE.Processo
                 produto.DescricaoPorcentual = 0;
                 produto.PrecoPromocao = produto.Preco;
             }
-            else if (diasParaVencer <= configuracao.DiasAlertaVermelho)
+            else if (diasParaVencer <= ConfiguracaoModel.DiasLimiteVermelho)
             {
                 produto.Status = "VERMELHO";
                 produto.DescricaoPorcentual = configuracao.PercentualDescontoVermelho;
                 produto.PrecoPromocao = CalcularPrecoComDesconto(produto.Preco, configuracao.PercentualDescontoVermelho);
             }
-            else if (diasParaVencer <= configuracao.DiasAlertaAmarelo)
+            else if (diasParaVencer <= ConfiguracaoModel.DiasLimiteAmarelo)
             {
                 produto.Status = "AMARELO";
                 produto.DescricaoPorcentual = configuracao.PercentualDescontoAmarelo;

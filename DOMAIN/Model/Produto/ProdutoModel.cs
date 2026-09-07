@@ -17,6 +17,9 @@ namespace DOMAIN.Model.Produto
         [FirestoreProperty("oldPrice")]
         public double Preco { get; set; }
 
+        [FirestoreProperty("precoCusto")]
+        public double? PrecoCusto { get; set; }
+
         [FirestoreProperty("newPrice")]
         public double PrecoPromocao { get; set; }
 

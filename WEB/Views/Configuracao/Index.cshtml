@@ -1,4 +1,5 @@
-@model DOMAIN.Model.Configuracao.ConfiguracaoModel
+@using DOMAIN.Model.Configuracao
+@model ConfiguracaoModel
 @{
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
     ViewData["Title"] = "Configurações";
@@ -24,8 +25,8 @@
     </div>
     <div class="p-4">
         <p class="text-muted mb-4" style="font-size:13px;">
-            Essas regras definem quando um produto entra em alerta amarelo ou vermelho na listagem,
-            e qual desconto o sistema sugere automaticamente para cada faixa de dias restantes até o vencimento.
+            Os prazos de alerta são fixos no sistema — abaixo de @ConfiguracaoModel.DiasLimiteVermelho dia(s) o produto entra em alerta vermelho,
+            e abaixo de @ConfiguracaoModel.DiasLimiteAmarelo dia(s) entra em alerta amarelo. Aqui você define apenas o desconto sugerido para cada faixa.
         </p>
 
         <form asp-controller="Configuracao" asp-action="Index" method="post">
@@ -36,9 +37,8 @@
                             <span class="badge-amarelo">Alerta Amarelo</span>
                         </div>
                         <div class="p-3">
-                            <label asp-for="DiasAlertaAmarelo" class="form-label-custom">Dias antes do vencimento</label>
-                            <input asp-for="DiasAlertaAmarelo" type="number" min="0" class="form-control form-control-custom mb-3" />
-                            <span asp-validation-for="DiasAlertaAmarelo" class="text-danger" style="font-size:12px;"></span>
+                            <label class="form-label-custom">Dias antes do vencimento</label>
+                            <input type="number" class="form-control form-control-custom mb-3" value="@ConfiguracaoModel.DiasLimiteAmarelo" disabled />
 
                             <label asp-for="PercentualDescontoAmarelo" class="form-label-custom">Desconto sugerido (%)</label>
                             <input asp-for="PercentualDescontoAmarelo" type="number" min="0" max="100" class="form-control form-control-custom" />
@@ -53,9 +53,8 @@
                             <span class="badge-vermelho">Alerta Vermelho</span>
                         </div>
                         <div class="p-3">
-                            <label asp-for="DiasAlertaVermelho" class="form-label-custom">Dias antes do vencimento</label>
-                            <input asp-for="DiasAlertaVermelho" type="number" min="0" class="form-control form-control-custom mb-3" />
-                            <span asp-validation-for="DiasAlertaVermelho" class="text-danger" style="font-size:12px;"></span>
+                            <label class="form-label-custom">Dias antes do vencimento</label>
+                            <input type="number" class="form-control form-control-custom mb-3" value="@ConfiguracaoModel.DiasLimiteVermelho" disabled />
 
                             <label asp-for="PercentualDescontoVermelho" class="form-label-custom">Desconto sugerido (%)</label>
                             <input asp-for="PercentualDescontoVermelho" type="number" min="0" max="100" class="form-control form-control-custom" />
@@ -68,9 +67,8 @@
             <div class="mt-4 d-flex align-items-start gap-2" style="font-size:12px; color:var(--text-muted-custom);">
                 <i class="fas fa-info-circle mt-1"></i>
                 <span>
-                    O alerta amarelo dispara primeiro, então o número de dias dele deve ser maior que o do alerta vermelho.
-                    Um produto entra em VERMELHO quando faltam @Model.DiasAlertaVermelho dia(s) ou menos para vencer,
-                    e em AMARELO quando faltam @Model.DiasAlertaAmarelo dia(s) ou menos (e mais que @Model.DiasAlertaVermelho).
+                    Um produto entra em VERMELHO quando faltam @ConfiguracaoModel.DiasLimiteVermelho dia(s) ou menos para vencer,
+                    e em AMARELO quando faltam @ConfiguracaoModel.DiasLimiteAmarelo dia(s) ou menos (e mais que @ConfiguracaoModel.DiasLimiteVermelho).
                 </span>
             </div>
 

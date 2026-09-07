@@ -10,14 +10,6 @@ namespace DOMAIN.Validador.Configuracao
 
         public override void AssineRegrasAtualizacao()
         {
-            RuleFor(c => c.DiasAlertaVermelho)
-                .GreaterThanOrEqualTo(0)
-                .WithMessage("Os dias do alerta vermelho não podem ser negativos.");
-
-            RuleFor(c => c.DiasAlertaAmarelo)
-                .GreaterThan(c => c.DiasAlertaVermelho)
-                .WithMessage("O alerta amarelo precisa valer para mais dias antes do vencimento do que o alerta vermelho (ele dispara primeiro, antes da faixa mais crítica).");
-
             RuleFor(c => c.PercentualDescontoAmarelo)
                 .InclusiveBetween(0, 100)
                 .WithMessage("O desconto do alerta amarelo deve estar entre 0 e 100%.");

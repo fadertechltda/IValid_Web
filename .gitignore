@@ -362,16 +362,8 @@ MigrationBackup/
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
 
-# Segurança: Não subir chaves privadas do Firebase
+# Segurança: chave privada da conta de serviço do Firebase — bloqueada pelo
+# GitHub Push Protection se versionada. Compartilhe esse arquivo com o time
+# por fora do Git.
 Chave/
-**/Chave/*.json
-
-# Chave do Firebase
 firebase-key.json
-
-# Segurança: appsettings.Development.json guarda segredos locais
-# (ApiKeyInterna, CodigoConviteAdmin) que não devem ir para o repositório.
-# Em produção, use variáveis de ambiente ou um cofre de segredos (ex: Azure Key Vault),
-# nunca o appsettings.json versionado.
-**/appsettings.Development.json
-**/appsettings.Local.json
