@@ -1,0 +1,26 @@
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY DOMAIN/DOMAIN.csproj DOMAIN/
+COPY Excecoes/EXCECOES.csproj Excecoes/
+COPY REPOSITORY/REPOSITORY.csproj REPOSITORY/
+COPY SERVICE/SERVICE.csproj SERVICE/
+COPY WEB_API/WEB_API.csproj WEB_API/
+RUN dotnet restore WEB_API/WEB_API.csproj
+
+COPY DOMAIN/ DOMAIN/
+COPY Excecoes/ Excecoes/
+COPY REPOSITORY/ REPOSITORY/
+COPY SERVICE/ SERVICE/
+COPY WEB_API/ WEB_API/
+
+RUN dotnet publish WEB_API/WEB_API.csproj -c Release -o /app/publish --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS final
+WORKDIR /app
+COPY --from=build /app/publish .
+
+ENV ASPNETCORE_ENVIRONMENT=Production
+EXPOSE 10000
+
+ENTRYPOINT ["sh", "-c", "ASPNETCORE_URLS=http://+:${PORT:-10000} dotnet WEB_API.dll"]

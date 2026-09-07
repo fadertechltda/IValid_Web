@@ -1,0 +1,8 @@
+**/bin/
+**/obj/
+**/.vs/
+Chave/
+**/appsettings.Development.json
+**/appsettings.Local.json
+*.md
+.git/

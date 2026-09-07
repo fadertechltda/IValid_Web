@@ -2,6 +2,7 @@ using DOMAIN.Validador.Produto;
 using DOMAIN.Validador.Configuracao;
 using DOMAIN.Validador.Funcionario;
 using Google.Cloud.Firestore;
+using Microsoft.AspNetCore.HttpOverrides;
 using REPOSITORY.Mapeadores.Produto;
 using REPOSITORY.Mapeadores.Usuario;
 using REPOSITORY.Mapeadores.Configuracao;
@@ -68,6 +69,13 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -77,6 +85,7 @@ if (app.Environment.IsDevelopment())
     app.MapScalarApiReference();
 }
 
+app.UseForwardedHeaders();
 app.UseHttpsRedirection();
 
 var apiKeyInterna = builder.Configuration["Seguranca:ApiKeyInterna"];
