@@ -1,0 +1,99 @@
+@model PerfilModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Perfis";
+    ViewData["ActivePage"] = "Perfil";
+    ViewData["PageTitle"] = "Perfis e permissões";
+    ViewData["PageSubtitle"] = "Defina o que cada perfil de funcionário pode acessar no painel.";
+    var perfis = ViewData["Perfis"] as List<PerfilModel> ?? [];
+    var editando = !string.IsNullOrEmpty(Model.Id);
+    var permissoesMarcadas = Model.Permissoes ?? [];
+}
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h2 class="admin-card-title"><i class="fas fa-user-shield me-2" style="color:var(--azul)"></i>@(editando ? "Editar perfil" : "Novo perfil")</h2>
+            </div>
+            <div class="p-4">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert-admin danger mb-3"><i class="fas fa-exclamation-circle"></i> @Html.ValidationSummary(false)</div>
+                }
+                <form asp-controller="Perfil" asp-action="Salvar" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+
+                    <label class="form-label-custom">Nome do perfil *</label>
+                    <input asp-for="Nome" class="form-control form-control-custom w-100 mb-4" maxlength="60" placeholder="Ex: Caixa" />
+
+                    <label class="form-label-custom">Permissões</label>
+                    <div class="d-flex flex-column gap-2 mb-3">
+                        @foreach (var permissao in PermissaoUtil.Todas)
+                        {
+                            var idCampo = $"permissao-{permissao.Chave}";
+                            <div class="form-check p-2 ps-5" style="border:1px solid #eef0f4;border-radius:10px;">
+                                <input class="form-check-input" type="checkbox" name="Permissoes" value="@permissao.Chave" id="@idCampo"
+                                       @(permissoesMarcadas.Contains(permissao.Chave) ? "checked" : "") />
+                                <label class="form-check-label" for="@idCampo">
+                                    <span style="font-weight:600;">@permissao.Nome</span>
+                                    <span class="d-block" style="font-size:12px;color:#888;">@permissao.Descricao</span>
+                                </label>
+                            </div>
+                        }
+                    </div>
+
+                    <div class="d-flex align-items-start gap-2 mb-3" style="font-size:12px;color:#888;">
+                        <i class="fas fa-info-circle mt-1"></i>
+                        <span>Todo perfil acessa o dashboard. Funcionários e perfis são exclusivos do Administrador. Mudanças valem no próximo login do funcionário.</span>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        @if (editando)
+                        {
+                            <a asp-controller="Perfil" asp-action="Index" class="btn-outline-custom" style="text-decoration:none;">Cancelar</a>
+                        }
+                        <button type="submit" class="btn-success-custom"><i class="fas fa-save me-1"></i> Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="admin-card">
+            <div class="table-responsive">
+                <table class="table admin-table mb-0">
+                    <thead>
+                        <tr><th>Perfil</th><th>Permissões</th><th>Funcionários</th><th style="text-align:center">Ações</th></tr>
+                    </thead>
+                    <tbody>
+                        @if (perfis.Count == 0)
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-4">Nenhum perfil cadastrado.</td></tr>
+                        }
+                        @foreach (var perfil in perfis)
+                        {
+                            var nomesPermissoes = PermissaoUtil.Todas.Where(p => perfil.Permissoes.Contains(p.Chave)).Select(p => p.Nome).ToList();
+                            <tr>
+                                <td style="font-weight:600;">@perfil.Nome</td>
+                                <td style="font-size:12px;">@(nomesPermissoes.Count == 0 ? "Somente dashboard" : string.Join(", ", nomesPermissoes))</td>
+                                <td>@perfil.QuantidadeFuncionarios</td>
+                                <td class="text-center">
+                                    <div class="d-inline-flex gap-2">
+                                        <a asp-controller="Perfil" asp-action="Index" asp-route-editar="@perfil.Id" class="btn-outline-custom" style="text-decoration:none;" title="Editar"><i class="fas fa-pen"></i></a>
+                                        <form asp-controller="Perfil" asp-action="Excluir" asp-route-id="@perfil.Id" method="post" onsubmit="return confirm('Excluir o perfil @perfil.Nome?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn-danger-custom" title="Excluir"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

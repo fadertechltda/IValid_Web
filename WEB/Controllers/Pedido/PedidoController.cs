@@ -1,3 +1,4 @@
+using DOMAIN.Model.Perfil;
 using DOMAIN.Model.Pedido;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
@@ -7,7 +8,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace WEB.Controllers.Pedido
 {
-    [Authorize(Roles = "Administrador,Gerente,Atendente")]
+    [Authorize(Policy = PermissaoUtil.Pedidos)]
     public class PedidoController(IHttpClientFactory httpClientFactory) : Controller
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("IValidApi");

@@ -1,3 +1,4 @@
+using DOMAIN.Model.Perfil;
 using DOMAIN.Model.Usuario;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -67,8 +68,13 @@ namespace WEB.Controllers
                             new(ClaimTypes.Email, resultado.Email ?? ""),
                             new(ClaimTypes.Role, resultado.Perfil ?? ""),
                             new(ClaimTypes.NameIdentifier, resultado.Id ?? ""),
-                            new("SupermercadoId", resultado.SupermercadoId ?? "")
+                            new("SupermercadoId", resultado.SupermercadoId ?? ""),
+                            new("NomePerfil", resultado.NomePerfil ?? resultado.Perfil ?? "")
                         };
+
+                        reivindicacoes.AddRange(resultado.Permissoes
+                            .Where(PermissaoUtil.EhValida)
+                            .Select(permissao => new Claim(PermissaoUtil.TipoClaim, permissao)));
 
                         var identidadeReivindicacoes = new ClaimsIdentity(reivindicacoes, CookieAuthenticationDefaults.AuthenticationScheme);
 

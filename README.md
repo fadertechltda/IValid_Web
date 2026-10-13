@@ -123,6 +123,24 @@ Isolamento de dados entre lojas:
 - `ConfiguracaoModel` deixou de ser um documento único global (`geral`) e passou a ser um documento por `SupermercadoId` — cada loja tem seus próprios limiares de dias e percentuais de desconto.
 - `PedidoModel` criado pela API (`POST api/app/pedidos`) carrega `supermercadoId` e é filtrado diretamente por ele. Pedidos antigos, gravados pelo app direto no Firestore sem esse campo, continuam sendo associados de forma indireta: a API busca os Produtos da loja e filtra os Pedidos cujos itens referenciam algum desses IDs.
 
+## Perfis e permissões
+
+O Administrador (dono da loja) tem acesso total. Os funcionários acessam o painel conforme o **perfil** atribuído a eles, cadastrado em *Perfis e permissões* (só o Administrador vê essa tela e a de Funcionários).
+
+| Permissão | Libera |
+|---|---|
+| `produtos` | Produtos |
+| `pedidos` | Pedidos e mudança de status |
+| `financeiro` | Faturamento, lucro e valor em risco no dashboard |
+| `configuracoes` | Descontos e dados da loja |
+| `categorias` | Categorias |
+| `ongs` | ONGs |
+
+- Os perfis ficam na coleção `perfis`, um conjunto por loja. Na primeira vez em que uma loja lista perfis, o sistema cria Gerente (produtos, pedidos, financeiro), Operador de Estoque (produtos) e Atendente (pedidos), com as mesmas permissões que esses papéis tinham quando eram fixos no código.
+- Funcionários antigos (com o campo `perfil` texto e sem `perfilId`) são ligados a esses perfis automaticamente; ao serem editados, passam a gravar `perfilId`.
+- No login, as permissões do perfil viram claims `Permissao` no cookie, e cada tela usa uma policy com o nome da permissão. Por isso, mudanças em um perfil só valem no próximo login do funcionário.
+- Um perfil em uso por funcionários não pode ser excluído, e o nome "Administrador" é reservado.
+
 ## Autenticação e segurança
 
 O acesso ao painel administrativo é protegido em duas frentes:

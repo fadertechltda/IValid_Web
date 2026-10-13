@@ -44,8 +44,17 @@
 
                         <div class="col-12">
                             <label class="form-label-custom">Perfil *</label>
-                            <select asp-for="Perfil" class="form-control form-control-custom w-100" asp-items="Html.GetEnumSelectList<PerfilFuncionario>()"></select>
-                            <span asp-validation-for="Perfil" class="text-danger" style="font-size:12px;"></span>
+                            <select asp-for="PerfilId" class="form-select form-control-custom w-100">
+                                <option value="">Selecione um perfil</option>
+                                @foreach (var perfil in (ViewData["Perfis"] as List<PerfilModel>) ?? [])
+                                {
+                                    <option value="@perfil.Id">@perfil.Nome</option>
+                                }
+                            </select>
+                            <span asp-validation-for="PerfilId" class="text-danger" style="font-size:12px;"></span>
+                            <div style="font-size:12px;color:#888;margin-top:6px;">
+                                As permissões de cada perfil são definidas em <a asp-controller="Perfil" asp-action="Index">Perfis e permissões</a>.
+                            </div>
                         </div>
 
                         <div class="col-md-6">

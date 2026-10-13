@@ -19,6 +19,7 @@ using Microsoft.IdentityModel.Tokens;
 using REPOSITORY.Mapeadores.Categoria;
 using REPOSITORY.Mapeadores.Cliente;
 using REPOSITORY.Mapeadores.Ong;
+using REPOSITORY.Mapeadores.Perfil;
 using REPOSITORY.Mapeadores.Rotina;
 using REPOSITORY.Mapeadores.Transacao;
 using SERVICE.Integracao;
@@ -91,6 +92,10 @@ builder.Services.AddScoped<IOngMapeador, OngMapeador>();
 builder.Services.AddScoped<IClienteMapeador, ClienteMapeador>();
 builder.Services.AddScoped<ITransacaoMapeador, TransacaoMapeador>();
 builder.Services.AddScoped<IRotinaMapeador, RotinaMapeador>();
+
+builder.Services.AddScoped<IPerfilMapeador, PerfilMapeador>();
+builder.Services.AddScoped<PerfilProcesso>();
+builder.Services.AddScoped<PerfilFachada>();
 
 builder.Services.AddScoped<VitrineProcesso>();
 builder.Services.AddScoped<CategoriaProcesso>();

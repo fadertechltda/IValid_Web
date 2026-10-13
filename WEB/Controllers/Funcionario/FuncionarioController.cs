@@ -1,4 +1,5 @@
 using DOMAIN.Model.Funcionario;
+using DOMAIN.Model.Perfil;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
@@ -35,8 +36,9 @@ namespace WEB.Controllers.Funcionario
             return View(funcionarios);
         }
 
-        public IActionResult Create()
+        public async Task<IActionResult> Create()
         {
+            ViewData["Perfis"] = await ListarPerfisAsync();
             return View(new CriarFuncionarioModel());
         }
 
@@ -46,6 +48,7 @@ namespace WEB.Controllers.Funcionario
         {
             if (!ModelState.IsValid)
             {
+                ViewData["Perfis"] = await ListarPerfisAsync();
                 return View(modelo);
             }
 
@@ -71,6 +74,7 @@ namespace WEB.Controllers.Funcionario
                 ModelState.AddModelError(string.Empty, "Não foi possível conectar ao servidor. Tente novamente em instantes.");
             }
 
+            ViewData["Perfis"] = await ListarPerfisAsync();
             return View(modelo);
         }
 
@@ -95,10 +99,11 @@ namespace WEB.Controllers.Funcionario
             {
                 Id = funcionario.Id,
                 Nome = funcionario.Nome,
-                Perfil = funcionario.Perfil,
+                PerfilId = funcionario.PerfilId,
                 Ativo = funcionario.Ativo
             };
 
+            ViewData["Perfis"] = await ListarPerfisAsync();
             return View(modelo);
         }
 
@@ -130,7 +135,24 @@ namespace WEB.Controllers.Funcionario
                 ModelState.AddModelError(string.Empty, "Não foi possível conectar ao servidor. Tente novamente em instantes.");
             }
 
+            ViewData["Perfis"] = await ListarPerfisAsync();
             return View(modelo);
+        }
+
+        private async Task<List<PerfilModel>> ListarPerfisAsync()
+        {
+            try
+            {
+                var resposta = await _httpClient.GetAsync($"api/Perfil?supermercadoId={SupermercadoId}");
+                if (resposta.IsSuccessStatusCode) return await CadastroApiHelper.LerAsync<List<PerfilModel>>(resposta) ?? [];
+            }
+            catch (HttpRequestException ex)
+            {
+                _logger.LogError(ex, "Erro de conexão com a API ao listar perfis");
+            }
+
+            TempData["Erro"] = "Não foi possível carregar os perfis.";
+            return [];
         }
 
         private static async Task<string> ExtrairMensagemErro(HttpResponseMessage response)

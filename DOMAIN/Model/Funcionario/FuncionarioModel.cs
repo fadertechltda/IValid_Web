@@ -20,23 +20,15 @@ namespace DOMAIN.Model.Funcionario
         [FirestoreProperty("perfil")]
         public string? PerfilString { get; set; }
 
+        [FirestoreProperty("perfilId")]
+        public string? PerfilId { get; set; }
+
         [FirestoreProperty("ativo")]
         public bool Ativo { get; set; } = true;
 
-        public PerfilFuncionario Perfil
-        {
-            get
-            {
-                if (Enum.TryParse<PerfilFuncionario>(PerfilString, true, out var resultado))
-                {
-                    return resultado;
-                }
-                return PerfilFuncionario.Atendente;
-            }
-            set
-            {
-                PerfilString = value.ToString();
-            }
-        }
+        public string? PerfilNome { get; set; }
+
+        public PerfilFuncionario? PerfilLegado =>
+            Enum.TryParse<PerfilFuncionario>(PerfilString, true, out var perfil) ? perfil : null;
     }
 }

@@ -7,8 +7,8 @@
     ViewData["PageTitle"] = "Visão Geral";
     ViewData["PageSubtitle"] = "Acompanhe as métricas e alertas da sua loja.";
 
-    bool podeVerProdutos = User.IsInRole("Administrador") || User.IsInRole("Gerente") || User.IsInRole("OperadorEstoque");
-    bool podeVerFinanceiro = User.IsInRole("Administrador") || User.IsInRole("Gerente");
+    bool podeVerProdutos = User.TemPermissao(PermissaoUtil.Produtos);
+    bool podeVerFinanceiro = User.TemPermissao(PermissaoUtil.Financeiro);
 }
 
 <div class="row row-cols-2 row-cols-xl-6 g-3 mb-4">

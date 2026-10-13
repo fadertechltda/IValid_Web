@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.AspNetCore.Mvc.Authorization;
+using WEB.Seguranca;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +30,8 @@ builder.Services.AddControllersWithViews(options =>
         options.ModelBindingMessageProvider.SetValueIsInvalidAccessor(valor => $"O valor '{valor}' é inválido.");
         options.ModelBindingMessageProvider.SetMissingKeyOrValueAccessor(() => "O valor é obrigatório.");
     });
+
+builder.Services.AddAuthorization(opcoes => opcoes.AdicionarPoliticasDePermissao());
 
 builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.Cookies.CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

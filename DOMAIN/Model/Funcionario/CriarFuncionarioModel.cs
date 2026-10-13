@@ -16,6 +16,6 @@ namespace DOMAIN.Model.Funcionario
         public string? ConfirmarSenha { get; set; }
 
         [Required(ErrorMessage = "O perfil é obrigatório.")]
-        public PerfilFuncionario Perfil { get; set; }
+        public string? PerfilId { get; set; }
     }
 }

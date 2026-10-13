@@ -1,4 +1,5 @@
 using DOMAIN.Model.Funcionario;
+using DOMAIN.Model.Perfil;
 using DOMAIN.Model.Supermercado;
 using DOMAIN.Model.Usuario;
 using Excecoes;
@@ -6,11 +7,12 @@ using SERVICE.Processo;
 
 namespace SERVICE.Fachada
 {
-    public class UsuarioFachada(UsuarioProcesso usuarioProcesso, SupermercadoProcesso supermercadoProcesso, FuncionarioProcesso funcionarioProcesso, EmailProcesso emailProcesso)
+    public class UsuarioFachada(UsuarioProcesso usuarioProcesso, SupermercadoProcesso supermercadoProcesso, FuncionarioProcesso funcionarioProcesso, PerfilProcesso perfilProcesso, EmailProcesso emailProcesso)
     {
         private readonly UsuarioProcesso _usuarioProcesso = usuarioProcesso;
         private readonly SupermercadoProcesso _supermercadoProcesso = supermercadoProcesso;
         private readonly FuncionarioProcesso _funcionarioProcesso = funcionarioProcesso;
+        private readonly PerfilProcesso _perfilProcesso = perfilProcesso;
         private readonly EmailProcesso _emailProcesso = emailProcesso;
 
         public async Task<string> CriarAdministrador(RegistroModel registro)
@@ -99,8 +101,10 @@ namespace SERVICE.Fachada
                 Id = usuario.Id,
                 Nome = usuario.NomeCompleto,
                 Email = usuario.Email,
-                Perfil = TipoUsuario.Administrador.ToString(),
-                SupermercadoId = usuario.SupermercadoId
+                Perfil = PermissaoUtil.PerfilAdministrador,
+                NomePerfil = PermissaoUtil.PerfilAdministrador,
+                SupermercadoId = usuario.SupermercadoId,
+                Permissoes = [.. PermissaoUtil.Chaves]
             };
         }
 
@@ -116,13 +120,17 @@ namespace SERVICE.Fachada
             if (!FuncionarioProcesso.VerificarSenha(funcionario, senha))
                 throw new IValidExcecao(CodigoExcecao.ValidacaoSeguranca, "Senha inválida.");
 
+            PerfilModel? perfil = await _perfilProcesso.ResolverPerfilDoFuncionarioAsync(funcionario);
+
             return new ResultadoLoginModel
             {
                 Id = funcionario.Id,
                 Nome = funcionario.Nome,
                 Email = null,
-                Perfil = funcionario.Perfil.ToString(),
-                SupermercadoId = funcionario.SupermercadoId
+                Perfil = PermissaoUtil.PerfilFuncionario,
+                NomePerfil = perfil?.Nome ?? "Sem perfil",
+                SupermercadoId = funcionario.SupermercadoId,
+                Permissoes = perfil?.Permissoes ?? []
             };
         }
 

@@ -401,7 +401,7 @@
             </a>
 
             <div class="nav-section-title">Gestão</div>
-            @if (User.IsInRole("Administrador") || User.IsInRole("Gerente") || User.IsInRole("OperadorEstoque"))
+            @if (User.TemPermissao(PermissaoUtil.Produtos))
             {
                 <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Produto" ? "active" : "")"
                    asp-controller="Produto" asp-action="Index">
@@ -409,7 +409,7 @@
                     Produtos
                 </a>
             }
-            @if (User.IsInRole("Administrador") || User.IsInRole("Gerente") || User.IsInRole("Atendente"))
+            @if (User.TemPermissao(PermissaoUtil.Pedidos))
             {
                 <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Pedido" ? "active" : "")"
                    asp-controller="Pedido" asp-action="Index">
@@ -418,24 +418,47 @@
                 </a>
             }
 
-            @if (User.IsInRole("Administrador"))
+            @{
+                bool mostrarSistema = User.EhAdministrador()
+                    || User.TemPermissao(PermissaoUtil.Categorias)
+                    || User.TemPermissao(PermissaoUtil.Ongs)
+                    || User.TemPermissao(PermissaoUtil.Configuracoes);
+            }
+            @if (mostrarSistema)
             {
                 <div class="nav-section-title">Sistema</div>
+            }
+            @if (User.EhAdministrador())
+            {
                 <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Funcionario" ? "active" : "")"
                    asp-controller="Funcionario" asp-action="Index">
                     <span class="icon"><i class="fas fa-users"></i></span>
                     Funcionários
                 </a>
+                <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Perfil" ? "active" : "")"
+                   asp-controller="Perfil" asp-action="Index">
+                    <span class="icon"><i class="fas fa-user-shield"></i></span>
+                    Perfis e permissões
+                </a>
+            }
+            @if (User.TemPermissao(PermissaoUtil.Categorias))
+            {
                 <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Categoria" ? "active" : "")"
                    asp-controller="Categoria" asp-action="Index">
                     <span class="icon"><i class="fas fa-tags"></i></span>
                     Categorias
                 </a>
+            }
+            @if (User.TemPermissao(PermissaoUtil.Ongs))
+            {
                 <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Ong" ? "active" : "")"
                    asp-controller="Ong" asp-action="Index">
                     <span class="icon"><i class="fas fa-hand-holding-heart"></i></span>
                     ONGs
                 </a>
+            }
+            @if (User.TemPermissao(PermissaoUtil.Configuracoes))
+            {
                 <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Configuracoes" ? "active" : "")"
                    asp-controller="Configuracao" asp-action="Index">
                     <span class="icon"><i class="fas fa-cog"></i></span>
@@ -452,7 +475,7 @@
                 <div class="user-name" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 130px;">
                     @(User.Identity?.Name ?? "Administrador")
                 </div>
-                <div class="user-role">Super Admin</div>
+                <div class="user-role">@User.NomePerfil()</div>
             </div>
         </div>
     </aside>

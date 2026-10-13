@@ -1,3 +1,4 @@
+using DOMAIN.Model.Perfil;
 using DOMAIN.Model.Configuracao;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +10,7 @@ using System.Text.Json;
 
 namespace WEB.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Policy = PermissaoUtil.Configuracoes)]
     public class ConfiguracaoController(IHttpClientFactory httpClientFactory, ILogger<ConfiguracaoController> logger) : Controller
     {
         private readonly HttpClient _clienteHttp = httpClientFactory.CreateClient("IValidApi");

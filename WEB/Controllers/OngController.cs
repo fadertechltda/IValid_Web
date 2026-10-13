@@ -1,10 +1,11 @@
+using DOMAIN.Model.Perfil;
 using DOMAIN.Model.Ong;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WEB.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Policy = PermissaoUtil.Ongs)]
     public class OngController(IHttpClientFactory httpClientFactory, ILogger<OngController> logger) : Controller
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("IValidApi");

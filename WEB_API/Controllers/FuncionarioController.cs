@@ -39,7 +39,7 @@ namespace WEB_API.Controllers
                 FuncionarioModel funcionario = new()
                 {
                     Nome = modelo.Nome,
-                    Perfil = modelo.Perfil,
+                    PerfilId = modelo.PerfilId,
                     SupermercadoId = supermercadoId
                 };
 
@@ -69,7 +69,7 @@ namespace WEB_API.Controllers
                 }
 
                 funcionarioExistente.Nome = modelo.Nome;
-                funcionarioExistente.Perfil = modelo.Perfil;
+                funcionarioExistente.PerfilId = modelo.PerfilId;
                 funcionarioExistente.Ativo = modelo.Ativo;
 
                 await _funcionarioFachada.AtualizarFuncionario(funcionarioExistente, modelo.NovaSenha);

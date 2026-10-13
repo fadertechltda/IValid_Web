@@ -11,7 +11,7 @@ namespace DOMAIN.Model.Funcionario
         public string? Nome { get; set; }
 
         [Required(ErrorMessage = "O perfil é obrigatório.")]
-        public PerfilFuncionario Perfil { get; set; }
+        public string? PerfilId { get; set; }
 
         public bool Ativo { get; set; }
 

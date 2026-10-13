@@ -1,3 +1,4 @@
+using DOMAIN.Model.Perfil;
 using DOMAIN.Model.Produto;
 using DOMAIN.Model.Configuracao;
 using DOMAIN.Model.Categoria;
@@ -10,7 +11,7 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace WEB.Controllers.Produto
 {
-    [Authorize(Roles = "Administrador,Gerente,OperadorEstoque")]
+    [Authorize(Policy = PermissaoUtil.Produtos)]
     public class ProdutoController(IHttpClientFactory httpClientFactory, ILogger<ProdutoController> logger) : Controller
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("IValidApi");

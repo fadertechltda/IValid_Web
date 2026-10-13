@@ -1,10 +1,11 @@
+using DOMAIN.Model.Perfil;
 using DOMAIN.Model.Categoria;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace WEB.Controllers
 {
-    [Authorize(Roles = "Administrador")]
+    [Authorize(Policy = PermissaoUtil.Categorias)]
     public class CategoriaController(IHttpClientFactory httpClientFactory, ILogger<CategoriaController> logger) : Controller
     {
         private readonly HttpClient _httpClient = httpClientFactory.CreateClient("IValidApi");

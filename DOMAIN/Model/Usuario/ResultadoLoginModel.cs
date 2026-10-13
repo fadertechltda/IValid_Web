@@ -7,5 +7,7 @@ namespace DOMAIN.Model.Usuario
         public string? Email { get; set; }
         public string? Perfil { get; set; }
         public string? SupermercadoId { get; set; }
+        public string? NomePerfil { get; set; }
+        public List<string> Permissoes { get; set; } = [];
     }
 }
