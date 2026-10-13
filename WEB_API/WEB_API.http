@@ -1,6 +1,63 @@
 @WEB_API_HostAddress = http://localhost:5170
+@token = cole-aqui-o-id-token-do-firebase
+@chaveInterna = cole-aqui-a-chave-interna
 
-GET {{WEB_API_HostAddress}}/weatherforecast/
+### Vitrine (pública)
+GET {{WEB_API_HostAddress}}/api/app/produtos?pagina=1&tamanhoPagina=20&ordem=vencimento
 Accept: application/json
 
 ###
+GET {{WEB_API_HostAddress}}/api/app/produtos/ofertas-relampago
+
+###
+GET {{WEB_API_HostAddress}}/api/app/categorias
+
+###
+GET {{WEB_API_HostAddress}}/api/app/supermercados
+
+###
+GET {{WEB_API_HostAddress}}/api/app/ongs
+
+### Cliente
+POST {{WEB_API_HostAddress}}/api/app/clientes
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{ "nomeCompleto": "Cliente Teste", "telefone": "31999999999" }
+
+###
+GET {{WEB_API_HostAddress}}/api/app/clientes/me
+Authorization: Bearer {{token}}
+
+### Pedido
+POST {{WEB_API_HostAddress}}/api/app/pedidos/validar
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "formaPagamento": "Dinheiro",
+  "cashbackUsado": 0,
+  "itens": [ { "produtoId": "ID_DO_PRODUTO", "quantidade": 1, "origem": "compra" } ]
+}
+
+###
+POST {{WEB_API_HostAddress}}/api/app/pedidos
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "formaPagamento": "Online",
+  "cashbackUsado": 0,
+  "itens": [ { "produtoId": "ID_DO_PRODUTO", "quantidade": 1, "origem": "compra" } ]
+}
+
+###
+POST {{WEB_API_HostAddress}}/api/app/pedidos/ID_DO_PEDIDO/pagamento/link
+Authorization: Bearer {{token}}
+
+### Painel
+PATCH {{WEB_API_HostAddress}}/api/Pedido/ID_DO_PEDIDO/status?supermercadoId=ID_DA_LOJA
+X-Internal-Api-Key: {{chaveInterna}}
+Content-Type: application/json
+
+{ "status": "SEPARADO" }

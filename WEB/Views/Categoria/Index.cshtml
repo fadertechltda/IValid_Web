@@ -1,0 +1,77 @@
+@using DOMAIN.Model.Categoria
+@model CategoriaModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Categorias";
+    ViewData["ActivePage"] = "Categoria";
+    ViewData["PageTitle"] = "Categorias de produto";
+    ViewData["PageSubtitle"] = "Usadas no cadastro de produtos e nos filtros do aplicativo (compartilhadas entre as lojas).";
+    var categorias = ViewData["Categorias"] as List<CategoriaModel> ?? [];
+    var editando = !string.IsNullOrEmpty(Model.Id);
+}
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h2 class="admin-card-title"><i class="fas fa-tag me-2" style="color:var(--azul)"></i>@(editando ? "Editar categoria" : "Nova categoria")</h2>
+            </div>
+            <div class="p-4">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert-admin danger mb-3"><i class="fas fa-exclamation-circle"></i> @Html.ValidationSummary(false)</div>
+                }
+                <form asp-controller="Categoria" asp-action="Salvar" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <label class="form-label-custom">Nome *</label>
+                    <input asp-for="Nome" class="form-control form-control-custom w-100 mb-3" maxlength="60" placeholder="Ex: Laticínios" />
+                    <label class="form-label-custom">Ordem de exibição</label>
+                    <input asp-for="Ordem" type="number" min="0" class="form-control form-control-custom w-100 mb-3" />
+                    <div class="d-flex justify-content-end gap-2">
+                        @if (editando)
+                        {
+                            <a asp-controller="Categoria" asp-action="Index" class="btn-outline-custom" style="text-decoration:none;">Cancelar</a>
+                        }
+                        <button type="submit" class="btn-success-custom"><i class="fas fa-save me-1"></i> Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="admin-card">
+            <div class="table-responsive">
+                <table class="table admin-table mb-0">
+                    <thead>
+                        <tr><th>Nome</th><th>Identificador</th><th>Ordem</th><th style="text-align:center">Ações</th></tr>
+                    </thead>
+                    <tbody>
+                        @if (categorias.Count == 0)
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-4">Nenhuma categoria cadastrada.</td></tr>
+                        }
+                        @foreach (var categoria in categorias)
+                        {
+                            <tr>
+                                <td style="font-weight:600;">@categoria.Nome</td>
+                                <td><code>@categoria.Id</code></td>
+                                <td>@categoria.Ordem</td>
+                                <td class="text-center">
+                                    <div class="d-inline-flex gap-2">
+                                        <a asp-controller="Categoria" asp-action="Index" asp-route-editar="@categoria.Id" class="btn-outline-custom" style="text-decoration:none;" title="Editar"><i class="fas fa-pen"></i></a>
+                                        <form asp-controller="Categoria" asp-action="Excluir" asp-route-id="@categoria.Id" method="post" onsubmit="return confirm('Excluir a categoria @categoria.Nome?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn-danger-custom" title="Excluir"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

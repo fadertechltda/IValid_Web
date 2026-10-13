@@ -79,6 +79,49 @@
     </div>
 </div>
 
+@{
+    var dadosLoja = ViewData["DadosLoja"] as DOMAIN.Model.Vitrine.DadosLojaModel ?? new DOMAIN.Model.Vitrine.DadosLojaModel();
+    var cultura = System.Globalization.CultureInfo.InvariantCulture;
+}
+
+<div class="admin-card mb-4">
+    <div class="admin-card-header">
+        <h5 class="admin-card-title">
+            <i class="fas fa-store me-2" style="color:var(--azul)"></i>
+            Dados da loja
+        </h5>
+    </div>
+    <div class="p-4">
+        <p class="text-muted mb-4" style="font-size:13px;">
+            Exibidos no aplicativo. A latitude e a longitude permitem ao app calcular a distância até a loja.
+        </p>
+        <form asp-controller="Configuracao" asp-action="DadosLoja" method="post">
+            @Html.AntiForgeryToken()
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label-custom">Nome da loja *</label>
+                    <input name="nome" value="@dadosLoja.Nome" class="form-control form-control-custom" maxlength="120" required />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label-custom">Endereço</label>
+                    <input name="endereco" value="@dadosLoja.Endereco" class="form-control form-control-custom" maxlength="250" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label-custom">Latitude</label>
+                    <input name="latitude" value="@dadosLoja.Latitude?.ToString(cultura)" class="form-control form-control-custom" placeholder="-19.9681" inputmode="decimal" />
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label-custom">Longitude</label>
+                    <input name="longitude" value="@dadosLoja.Longitude?.ToString(cultura)" class="form-control form-control-custom" placeholder="-44.1983" inputmode="decimal" />
+                </div>
+            </div>
+            <button type="submit" class="btn btn-danger-custom mt-4">
+                <i class="fas fa-save me-2"></i>Salvar dados da loja
+            </button>
+        </form>
+    </div>
+</div>
+
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
 }

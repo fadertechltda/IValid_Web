@@ -72,6 +72,31 @@ namespace REPOSITORY.Mapeadores.Produto
             return lista;
         }
 
+        public async Task<List<ProdutoModel>> ListarPorIdsAsync(IEnumerable<string> ids)
+        {
+            var referencias = ids
+                .Where(id => !string.IsNullOrWhiteSpace(id))
+                .Distinct()
+                .Select(id => _firestoreDb.Collection("produtos").Document(id))
+                .ToList();
+
+            if (referencias.Count == 0) return [];
+
+            IList<DocumentSnapshot> snapshots = await _firestoreDb.GetAllSnapshotsAsync(referencias);
+
+            return [.. snapshots.Where(s => s.Exists).Select(s =>
+            {
+                ProdutoModel produto = s.ConvertTo<ProdutoModel>();
+                produto.Id = s.Id;
+                return produto;
+            })];
+        }
+
+        public async Task AtualizarCamposAsync(string id, Dictionary<string, object> campos)
+        {
+            await _firestoreDb.Collection("produtos").Document(id).UpdateAsync(campos);
+        }
+
         private static void NormalizarDatas(ProdutoModel produto)
         {
             produto.DataVencimento = DateTime.SpecifyKind(produto.DataVencimento, DateTimeKind.Utc);

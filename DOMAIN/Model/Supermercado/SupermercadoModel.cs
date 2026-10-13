@@ -19,5 +19,11 @@ namespace DOMAIN.Model.Supermercado
 
         [FirestoreProperty("codigoAcesso")]
         public string? CodigoAcesso { get; set; }
+
+        [FirestoreProperty("latitude")]
+        public double? Latitude { get; set; }
+
+        [FirestoreProperty("longitude")]
+        public double? Longitude { get; set; }
     }
 }

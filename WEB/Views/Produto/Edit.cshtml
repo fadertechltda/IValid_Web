@@ -58,6 +58,26 @@
                             <span asp-validation-for="Nome" class="text-danger" style="font-size:12px;"></span>
                         </div>
 
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Marca</label>
+                            <input asp-for="Marca" class="form-control form-control-custom w-100" maxlength="80"
+                                   placeholder="Ex: Sadia" />
+                            <span asp-validation-for="Marca" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+
+                        <div class="col-md-6">
+                            <label class="form-label-custom">Categoria</label>
+                            <select asp-for="CategoriaId" class="form-select form-control-custom w-100">
+                                <option value="">Sem categoria</option>
+                                @foreach (var categoria in (ViewData["Categorias"] as List<DOMAIN.Model.Categoria.CategoriaModel>) ?? [])
+                                {
+                                    <option value="@categoria.Id">@categoria.Nome</option>
+                                }
+                            </select>
+                            <span asp-validation-for="CategoriaId" class="text-danger" style="font-size:12px;"></span>
+                        </div>
+
+
                         <div class="col-md-4">
                             <label class="form-label-custom">Preço Original (R$) *</label>
                             <div class="input-group">

@@ -27,6 +27,29 @@ namespace REPOSITORY.Mapeadores.Supermercado
             return supermercado;
         }
 
+        public async Task<List<SupermercadoModel>> ListarTodosAsync()
+        {
+            QuerySnapshot snapshot = await _firestoreDb.Collection("supermercados").GetSnapshotAsync();
+
+            return [.. snapshot.Documents.Select(doc =>
+            {
+                SupermercadoModel supermercado = doc.ConvertTo<SupermercadoModel>();
+                supermercado.Id = doc.Id;
+                return supermercado;
+            })];
+        }
+
+        public async Task AtualizarDadosAsync(string id, string? nome, string? endereco, double? latitude, double? longitude)
+        {
+            await _firestoreDb.Collection("supermercados").Document(id).UpdateAsync(new Dictionary<string, object?>
+            {
+                ["nome"] = nome,
+                ["endereco"] = endereco,
+                ["latitude"] = latitude,
+                ["longitude"] = longitude
+            });
+        }
+
         public async Task<SupermercadoModel?> ObterPorCodigoAcessoAsync(string codigoAcesso)
         {
             Query query = _firestoreDb.Collection("supermercados").WhereEqualTo("codigoAcesso", codigoAcesso);

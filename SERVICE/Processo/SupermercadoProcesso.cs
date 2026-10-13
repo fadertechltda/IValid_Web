@@ -2,13 +2,67 @@ using System.Globalization;
 using System.Text;
 using System.Text.RegularExpressions;
 using DOMAIN.Model.Supermercado;
+using DOMAIN.Model.Vitrine;
+using Excecoes;
+using REPOSITORY.Mapeadores.Produto;
 using REPOSITORY.Mapeadores.Supermercado;
 
 namespace SERVICE.Processo
 {
-    public class SupermercadoProcesso(ISupermercadoMapeador supermercadoMapeador)
+    public class SupermercadoProcesso(ISupermercadoMapeador supermercadoMapeador, IProdutoMapeador produtoMapeador)
     {
         private readonly ISupermercadoMapeador _supermercadoMapeador = supermercadoMapeador;
+        private readonly IProdutoMapeador _produtoMapeador = produtoMapeador;
+
+        public async Task<List<SupermercadoPublicoModel>> ListarPublicosAsync()
+        {
+            var supermercados = await _supermercadoMapeador.ListarTodosAsync();
+            return [.. supermercados.OrderBy(s => s.Nome).Select(ConverterPublico)];
+        }
+
+        public async Task<SupermercadoPublicoModel?> ObterPublicoAsync(string id)
+        {
+            var supermercado = await _supermercadoMapeador.ListarPorIdAsync(id);
+            return supermercado == null ? null : ConverterPublico(supermercado);
+        }
+
+        public async Task AtualizarDadosLojaAsync(string id, DadosLojaModel dados)
+        {
+            if (string.IsNullOrWhiteSpace(dados.Nome))
+            {
+                throw new IValidExcecao(CodigoExcecao.SolicitarValidacao, "Informe o nome da loja.");
+            }
+
+            if (dados.Latitude.HasValue != dados.Longitude.HasValue)
+            {
+                throw new IValidExcecao(CodigoExcecao.SolicitarValidacao, "Informe a latitude e a longitude juntas.");
+            }
+
+            var supermercado = await _supermercadoMapeador.ListarPorIdAsync(id)
+                ?? throw new IValidExcecao(CodigoExcecao.EntidadeNaoEncontrada, "Supermercado não encontrado.");
+
+            var nome = dados.Nome.Trim();
+            await _supermercadoMapeador.AtualizarDadosAsync(id, nome, dados.Endereco?.Trim(), dados.Latitude, dados.Longitude);
+
+            if (supermercado.Nome != nome)
+            {
+                var produtos = await _produtoMapeador.ListarPorSupermercadoAsync(id);
+
+                foreach (var produto in produtos.Where(p => !string.IsNullOrEmpty(p.Id)))
+                {
+                    await _produtoMapeador.AtualizarCamposAsync(produto.Id!, new Dictionary<string, object> { ["storeName"] = nome });
+                }
+            }
+        }
+
+        private static SupermercadoPublicoModel ConverterPublico(SupermercadoModel supermercado) => new()
+        {
+            Id = supermercado.Id,
+            Nome = supermercado.Nome,
+            Endereco = supermercado.Endereco,
+            Latitude = supermercado.Latitude,
+            Longitude = supermercado.Longitude
+        };
 
         public async Task<string> CriarSupermercado(SupermercadoModel supermercado)
         {

@@ -7,6 +7,9 @@ namespace Excecoes
         SolicitarValidacao,
         Concorrencia,
         EntidadeNaoEncontrada,
-        NaoAutorizado
+        NaoAutorizado,
+        EstoqueInsuficiente,
+        PagamentoNaoConfirmado,
+        TransicaoStatusInvalida
     }
 }

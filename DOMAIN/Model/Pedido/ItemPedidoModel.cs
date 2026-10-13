@@ -14,7 +14,19 @@ namespace DOMAIN.Model.Pedido
         [FirestoreProperty("quantity")]
         public int Quantidade { get; set; }
 
+        [FirestoreProperty("unitPrice")]
+        public double PrecoUnitario { get; set; }
+
+        [FirestoreProperty("originalUnitPrice")]
+        public double PrecoUnitarioOriginal { get; set; }
+
         [FirestoreProperty("subtotal")]
         public double Subtotal { get; set; }
+
+        [FirestoreProperty("origin")]
+        public string? Origem { get; set; }
+
+        [FirestoreProperty("isDonation")]
+        public bool EhDoacao { get; set; }
     }
 }

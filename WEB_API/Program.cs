@@ -12,6 +12,18 @@ using REPOSITORY.Mapeadores.Funcionario;
 using SERVICE.Fachada;
 using SERVICE.Processo;
 using Scalar.AspNetCore;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using REPOSITORY.Mapeadores.Categoria;
+using REPOSITORY.Mapeadores.Cliente;
+using REPOSITORY.Mapeadores.Ong;
+using REPOSITORY.Mapeadores.Rotina;
+using REPOSITORY.Mapeadores.Transacao;
+using SERVICE.Integracao;
+using SERVICE.Opcoes;
+using WEB_API.Infraestrutura;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -24,7 +36,11 @@ if (!string.IsNullOrEmpty(firebasePath))
     Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", caminhoAbsoluto);
 }
 
-builder.Services.AddSingleton(_ => FirestoreDb.Create(projectId));
+builder.Services.AddSingleton(_ => new FirestoreDbBuilder
+{
+    ProjectId = projectId,
+    EmulatorDetection = Google.Api.Gax.EmulatorDetection.EmulatorOrProduction
+}.Build());
 
 builder.Services.AddHttpClient();
 
@@ -65,9 +81,61 @@ builder.Services.AddScoped<PedidoFachada>();
 builder.Services.AddScoped<DashboardProcesso>();
 builder.Services.AddScoped<DashboardFachada>();
 
+var pagamentoOpcoes = builder.Configuration.GetSection("Pagamento").Get<PagamentoOpcoes>() ?? new PagamentoOpcoes();
+var notificacaoOpcoes = builder.Configuration.GetSection("Notificacoes").Get<NotificacaoOpcoes>() ?? new NotificacaoOpcoes();
+builder.Services.AddSingleton(pagamentoOpcoes);
+builder.Services.AddSingleton(notificacaoOpcoes);
+
+builder.Services.AddScoped<ICategoriaMapeador, CategoriaMapeador>();
+builder.Services.AddScoped<IOngMapeador, OngMapeador>();
+builder.Services.AddScoped<IClienteMapeador, ClienteMapeador>();
+builder.Services.AddScoped<ITransacaoMapeador, TransacaoMapeador>();
+builder.Services.AddScoped<IRotinaMapeador, RotinaMapeador>();
+
+builder.Services.AddScoped<VitrineProcesso>();
+builder.Services.AddScoped<CategoriaProcesso>();
+builder.Services.AddScoped<OngProcesso>();
+builder.Services.AddScoped<ClienteProcesso>();
+builder.Services.AddScoped<INotificacaoProcesso, NotificacaoProcesso>();
+builder.Services.AddScoped<PagamentoProcesso>();
+builder.Services.AddScoped<RotinaProcesso>();
+
+builder.Services.AddScoped<VitrineFachada>();
+builder.Services.AddScoped<ClienteFachada>();
+builder.Services.AddScoped<CategoriaFachada>();
+builder.Services.AddScoped<OngFachada>();
+builder.Services.AddScoped<SupermercadoFachada>();
+
+builder.Services.AddHttpClient<InfinitePayCliente>(cliente =>
+{
+    cliente.BaseAddress = new Uri(pagamentoOpcoes.InfinitePayBaseUrl.TrimEnd('/') + "/");
+    cliente.Timeout = TimeSpan.FromSeconds(20);
+});
+
+builder.Services.AddHostedService<RotinaDiariaService>();
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opcoes =>
+    {
+        opcoes.Authority = $"https://securetoken.google.com/{projectId}";
+        opcoes.MapInboundClaims = false;
+        opcoes.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidIssuer = $"https://securetoken.google.com/{projectId}",
+            ValidateAudience = true,
+            ValidAudience = projectId,
+            ValidateLifetime = true,
+            NameClaimType = "user_id"
+        };
+    });
+
+builder.Services.AddAuthorization();
+
 builder.Services.AddControllers();
 
-builder.Services.AddOpenApi();
+builder.Services.AddOpenApi(opcoes => opcoes.AddDocumentTransformer<DocumentacaoSegurancaTransformer>());
 
 builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
@@ -77,6 +145,18 @@ builder.Services.Configure<ForwardedHeadersOptions>(options =>
 });
 
 var app = builder.Build();
+
+if (FirebaseApp.DefaultInstance == null)
+{
+    try
+    {
+        FirebaseApp.Create(new AppOptions { Credential = GoogleCredential.GetApplicationDefault(), ProjectId = projectId });
+    }
+    catch (Exception ex)
+    {
+        app.Logger.LogWarning(ex, "FirebaseApp não inicializado: as notificações push ficarão desativadas.");
+    }
+}
 
 if (app.Environment.IsDevelopment())
 {
@@ -95,8 +175,10 @@ app.Use(async (context, next) =>
     var caminho = context.Request.Path.Value ?? string.Empty;
     var ehRotaDeDocumentacao = caminho.StartsWith("/openapi", StringComparison.OrdinalIgnoreCase)
                              || caminho.StartsWith("/scalar", StringComparison.OrdinalIgnoreCase);
+    var ehRotaDoAplicativo = caminho.StartsWith("/api/app/", StringComparison.OrdinalIgnoreCase)
+                          || caminho.Equals("/api/app", StringComparison.OrdinalIgnoreCase);
 
-    if (!ehRotaDeDocumentacao)
+    if (!ehRotaDeDocumentacao && !ehRotaDoAplicativo)
     {
         if (string.IsNullOrEmpty(apiKeyInterna))
         {
@@ -117,6 +199,7 @@ app.Use(async (context, next) =>
     await next();
 });
 
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
