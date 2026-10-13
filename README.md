@@ -13,6 +13,7 @@ Este documento descreve a visão geral do sistema e sua arquitetura técnica.
 - [Comunicação entre WEB e WEB_API](#comunicação-entre-web-e-web_api)
 - [Multiloja: um login por supermercado](#multiloja-um-login-por-supermercado)
 - [Autenticação e segurança](#autenticação-e-segurança)
+- [API do aplicativo mobile](#api-do-aplicativo-mobile)
 - [Modelo de dados (Firestore)](#modelo-de-dados-firestore)
 - [Estrutura de pastas](#estrutura-de-pastas)
 
@@ -28,7 +29,7 @@ Esses limiares (quantos dias antes do vencimento cada status começa) e os perce
 
 Na listagem de produtos, itens sem estoque são sempre exibidos por último, independentemente do status de validade — afinal, não há mais o que vender. Produtos vencidos seguem a mesma lógica de "vão para o final" dentro do grupo de itens que ainda têm estoque.
 
-O projeto é acadêmico e, por decisão de escopo, cobre apenas a parte web (painel administrativo e API). Um aplicativo mobile em Kotlin está previsto na concepção original do sistema, mas está fora do escopo desta implementação.
+O projeto é acadêmico e cobre o painel administrativo e a API. A API também expõe as rotas `api/app/*`, consumidas pelo aplicativo mobile (Flutter, em repositório próprio), descritas em [API do aplicativo mobile](#api-do-aplicativo-mobile).
 
 ## Stack tecnológica
 
@@ -98,7 +99,7 @@ A `WEB` nunca acessa o Firestore, o Firebase Authentication ou a lógica de neg�
 
 A `WEB` se comunica com a `WEB_API` exclusivamente via HTTP, usando um `HttpClient` nomeado (`IValidApi`) configurado com a URL base da API e um cabeçalho fixo de autenticação interna (`X-Internal-Api-Key`). A `WEB_API` valida esse cabeçalho em um middleware antes de processar qualquer requisição (exceto as rotas de documentação do Scalar/OpenAPI), rejeitando com `401` qualquer chamada sem a chave correta.
 
-Esse mecanismo existe porque a `WEB_API` não foi desenhada para ser pública: ela é de uso exclusivo do próprio sistema (hoje, só a `WEB`; no futuro, potencialmente também um app mobile).
+Esse mecanismo existe porque as rotas administrativas da `WEB_API` não são públicas: são de uso exclusivo da `WEB`. As rotas do aplicativo (`api/app/*`) não usam essa chave; elas são autenticadas pelo token do Firebase do cliente (veja [API do aplicativo mobile](#api-do-aplicativo-mobile)).
 
 Como o sistema é multiloja, praticamente toda chamada da `WEB` para a `WEB_API` sobre produtos, pedidos, configurações e funcionários inclui o `supermercadoId` do usuário logado como query string, extraído da claim `SupermercadoId` do cookie de autenticação. A `WEB_API` usa esse valor para filtrar e validar a posse de cada recurso antes de retorná-lo ou alterá-lo.
 
@@ -120,7 +121,7 @@ Isolamento de dados entre lojas:
 
 - `ProdutoModel`, `ConfiguracaoModel`, `UsuarioModel` e `FuncionarioModel` carregam um `SupermercadoId`, usado para filtrar e validar posse em toda operação de leitura/escrita.
 - `ConfiguracaoModel` deixou de ser um documento único global (`geral`) e passou a ser um documento por `SupermercadoId` — cada loja tem seus próprios limiares de dias e percentuais de desconto.
-- `PedidoModel` é escrito diretamente pelo aplicativo mobile (fora do escopo desta implementação) e não carrega `SupermercadoId`. Por isso, o isolamento de Pedidos é feito de forma indireta: a API busca os Produtos do supermercado do usuário logado, monta o conjunto de IDs desses produtos, e filtra os Pedidos cujos itens fazem referência a algum desses IDs.
+- `PedidoModel` criado pela API (`POST api/app/pedidos`) carrega `supermercadoId` e é filtrado diretamente por ele. Pedidos antigos, gravados pelo app direto no Firestore sem esse campo, continuam sendo associados de forma indireta: a API busca os Produtos da loja e filtra os Pedidos cujos itens referenciam algum desses IDs.
 
 ## Autenticação e segurança
 
@@ -133,16 +134,97 @@ O cadastro não exige mais um código de convite: qualquer pessoa pode se cadast
 
 Segredos (chave de API interna, credencial de acesso ao Firebase, credenciais de e-mail SMTP) ficam fora do controle de versão, em arquivos de configuração locais (`appsettings.Development.json` e a pasta `Chave/`), listados no `.gitignore`.
 
+## API do aplicativo mobile
+
+O aplicativo consome as rotas `api/app/*`. A documentação interativa (Scalar) fica em `/scalar` no ambiente de desenvolvimento e já mostra os esquemas de autenticação de cada rota.
+
+### Autenticação
+
+- O app envia `Authorization: Bearer <idToken>`, obtido com `FirebaseAuth.instance.currentUser!.getIdToken()`.
+- A API valida o token com o emissor `https://securetoken.google.com/{ProjectId}` (JWT Bearer). O `uid` do token identifica o cliente; nenhuma rota recebe o id do usuário pelo corpo ou pela URL.
+- As rotas de vitrine são públicas (somente leitura). As demais exigem o token.
+- O middleware da chave interna ignora `api/app/*`; todas as outras rotas continuam exigindo `X-Internal-Api-Key`.
+
+### Rotas
+
+| Método | Rota | Descrição |
+|---|---|---|
+| GET | `api/app/produtos` | Vitrine paginada. Filtros: `categoriaId`, `busca`, `supermercadoId`, `status`, `ordem` (`vencimento`, `menorPreco`, `maiorDesconto`, `nome`), `pagina`, `tamanhoPagina`. Sem vencidos nem esgotados; preço e dias calculados na hora |
+| GET | `api/app/produtos/ofertas-relampago` | Mesma vitrine, só faixa VERMELHO |
+| GET | `api/app/produtos/{id}` | Detalhe (inclui vencidos/esgotados, com `status` e `quantidadeDisponivel`) |
+| GET | `api/app/categorias` | Categorias |
+| GET | `api/app/supermercados` / `{id}` | Nome, endereço, latitude e longitude da loja |
+| GET | `api/app/ongs` | ONGs ativas |
+| POST | `api/app/clientes` | Cria o perfil do cliente logado (idempotente) |
+| GET / PUT | `api/app/clientes/me` | Perfil, nível de fidelidade, cashback e impacto |
+| GET | `api/app/clientes/me/impacto` | Totais de impacto |
+| GET | `api/app/clientes/me/favoritos` | Produtos favoritos |
+| PUT / DELETE | `api/app/clientes/me/favoritos/{produtoId}` | Adiciona / remove favorito |
+| POST | `api/app/clientes/me/dispositivos` | Registra o token FCM do aparelho |
+| POST | `api/app/clientes/me/dispositivos/remover` | Remove o token FCM (logout) |
+| POST | `api/app/pedidos/validar` | Simula o pedido: preços, cashback aplicável, total e problemas por item |
+| POST | `api/app/pedidos` | Cria o pedido (transação: confere estoque e validade, recalcula preços, baixa estoque, debita cashback) |
+| GET | `api/app/pedidos` / `{id}` | Pedidos do cliente |
+| POST | `api/app/pedidos/{id}/cancelar` | Cancela (só PENDENTE ou CONFIRMADO); devolve estoque e cashback |
+| POST | `api/app/pedidos/{id}/pagamento/link` | Gera o link do InfinitePay para pedido `Online` |
+| POST | `api/app/pedidos/{id}/pagamento/confirmar` | A API consulta o InfinitePay e só então marca o pedido como pago |
+
+Respostas de erro usam `{ codigo, informacaoAdicional }`: `400` validação, `401` sem token, `403` conta do painel, `404` não encontrado, `409` regra de negócio (estoque, transição de status, pagamento). Quando o pedido tem itens indisponíveis, o `409` traz também `resumo.problemas`.
+
+### Regras do pedido
+
+- Um pedido é de uma única loja. O preço de cada item é sempre calculado pela API (RN01), nunca enviado pelo app.
+- Itens têm `origem`: `compra` ou `doacao`. `ongId` é opcional e só vale com itens de doação.
+- Cashback: no máximo 15% do subtotal e nunca acima do saldo. O valor pedido acima disso é ajustado.
+- Formas de pagamento: `Dinheiro` e `Voucher` (pagos na retirada, pedido nasce CONFIRMADO), `Online` (nasce PENDENTE, com estoque reservado, até a confirmação do InfinitePay) e `Demonstracao` (só com `Pagamento:PermitirDemonstracao = true`). Pedido zerado pelo cashback vira `Cashback` e já nasce pago.
+- Pedido `Online` não pago é cancelado automaticamente após `Pagamento:MinutosExpiracaoPedidoPendente` minutos, devolvendo estoque e cashback.
+- Status: PENDENTE → CONFIRMADO → SEPARADO → (EM_ROTA) → FINALIZADO, ou CANCELADO. A loja muda o status pelo painel (`PATCH api/Pedido/{id}/status`), e o cliente recebe um push.
+- Cashback das doações, contagem de doações e impacto só são creditados quando o pedido é FINALIZADO. Assim, um cancelamento nunca precisa desfazer benefícios.
+- Pedido pago online e depois cancelado fica com `estornoPendente = true`; o painel mostra o aviso para a loja estornar.
+
+### Rotinas em segundo plano
+
+O `RotinaDiariaService` roda a cada `Rotinas:IntervaloMinutos` (padrão 15) e:
+
+- cancela pedidos online pendentes expirados;
+- uma vez por dia, recalcula `daysValidity`, `newPrice`, `status` e `descricaoPorcentual` dos produtos gravados (compatibilidade com quem ainda lê o Firestore direto);
+- uma vez por dia, envia um push para o tópico `ofertas` com a quantidade de produtos que entraram na faixa VERMELHO.
+
+O controle de "uma vez por dia" fica na coleção `rotinas`, para não repetir após reiniciar a API.
+
+### Configuração (`WEB_API/appsettings.json`)
+
+- `Pagamento`: InfiniteTag do recebedor, URL de retorno, modo demonstração e tempo de expiração.
+- `Notificacoes`: liga/desliga o FCM e define o tópico de ofertas. O envio usa a mesma credencial de serviço do Firestore (`Firebase:CredentialsPath`).
+- `Rotinas`: liga/desliga as rotinas e define o intervalo.
+- Para desenvolvimento local com o emulador do Firestore, basta definir `FIRESTORE_EMULATOR_HOST`.
+
+### Regras do Firestore após a migração do app
+
+Enquanto o app ainda grava direto no Firestore, as regras atuais devem ser mantidas. Depois que o app passar a usar só a API, o app não precisa mais escrever em `produtos`, `pedidos` nem nos campos de saldo de `users`. A API usa credencial de serviço e não é afetada pelas regras:
+
+```
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /{document=**} { allow read, write: if false; }
+  }
+}
+```
+
 ## Modelo de dados (Firestore)
 
 O Firestore é usado como banco de dados NoSQL, com as seguintes coleções principais:
 
 - **supermercados** — um documento por loja cadastrada (nome, CNPJ, endereço, código de acesso único). É a unidade de isolamento (a "loja") do sistema.
-- **produtos** — um documento por produto cadastrado (nome, preço, quantidade, data de vencimento, status calculado, percentual de desconto, preço promocional, imagem, `supermercadoId`).
-- **users** — um documento por Administrador cadastrado, com `supermercadoId` vinculando-o à sua loja.
+- **produtos** — um documento por produto cadastrado (nome, marca, categoria, preço, quantidade, data de vencimento, status calculado, percentual de desconto, preço promocional, imagem, `supermercadoId`, `storeName`).
+- **users** — um documento por Administrador cadastrado (id aleatório, com `supermercadoId`) e um documento por cliente do app (id = `uid` do Firebase Auth, com nome, endereço, `availableCashback`, `totalDonations`, `impact`, `favoritos` e `fcmTokens`).
 - **funcionarios** — um documento por funcionário cadastrado por um Administrador, com nome, hash de senha, perfil (Gerente/Operador de Estoque/Atendente), situação (ativo/inativo) e `supermercadoId`.
 - **configuracoes** — um documento por `supermercadoId`, guardando os limiares de dias e os percentuais de desconto usados no cálculo de status dos produtos daquela loja especificamente.
-- **pedidos** — escrita pelo aplicativo mobile (fora do escopo desta implementação); não possui `supermercadoId` — sua associação a uma loja é feita indiretamente através dos produtos referenciados em seus itens.
+- **pedidos** — criados pela API para o app, com `supermercadoId`, itens com `productId` e `unitPrice`, forma e status de pagamento, cashback usado e ganho, impacto e `origemApi = true`. Pedidos antigos sem `supermercadoId` continuam associados à loja pelos produtos dos itens.
+- **categories** — categorias de produto, compartilhadas entre as lojas (`name`, `order`, `icon`).
+- **ongs** — ONGs que recebem as doações (`nome`, `cidade`, `descricao`, `urlImagem`, `ativa`).
+- **rotinas** — controle de execução diária das rotinas em segundo plano.
 
 ## Estrutura de pastas
 

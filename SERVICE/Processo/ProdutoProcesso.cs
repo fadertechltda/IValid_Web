@@ -4,21 +4,32 @@ using REPOSITORY.Mapeadores.Produto;
 
 namespace SERVICE.Processo
 {
-    public class ProdutoProcesso(IProdutoMapeador produtoMapeador, ConfiguracaoProcesso configuracaoProcesso)
+    public class ProdutoProcesso(IProdutoMapeador produtoMapeador, ConfiguracaoProcesso configuracaoProcesso, SupermercadoProcesso supermercadoProcesso)
     {
         private readonly IProdutoMapeador _produtoMapeador = produtoMapeador;
         private readonly ConfiguracaoProcesso _configuracaoProcesso = configuracaoProcesso;
+        private readonly SupermercadoProcesso _supermercadoProcesso = supermercadoProcesso;
 
         public async Task CadastrarProduto(ProdutoModel produto)
         {
             await CalcularStatusEPrecosAsync(produto);
+            await PreencherNomeSupermercadoAsync(produto);
             await _produtoMapeador.CadastrarAsync(produto);
         }
 
         public async Task AtualizarProduto(ProdutoModel produto)
         {
             await CalcularStatusEPrecosAsync(produto);
+            await PreencherNomeSupermercadoAsync(produto);
             await _produtoMapeador.AtualizarAsync(produto);
+        }
+
+        private async Task PreencherNomeSupermercadoAsync(ProdutoModel produto)
+        {
+            if (string.IsNullOrEmpty(produto.SupermercadoId)) return;
+
+            var supermercado = await _supermercadoProcesso.ObterPorIdAsync(produto.SupermercadoId);
+            produto.NomeSupermercado = supermercado?.Nome;
         }
 
         public async Task DeletarProduto(ProdutoModel produto)
@@ -63,7 +74,7 @@ namespace SERVICE.Processo
             AplicarRegras(produto, configuracao);
         }
 
-        private static void AplicarRegras(ProdutoModel produto, ConfiguracaoModel configuracao)
+        public static void AplicarRegras(ProdutoModel produto, ConfiguracaoModel configuracao)
         {
             int diasParaVencer = (produto.DataVencimento.Date - DateTime.UtcNow.Date).Days;
             produto.DiaValidade = diasParaVencer > 0 ? diasParaVencer : 0;
@@ -96,7 +107,7 @@ namespace SERVICE.Processo
 
         private static double CalcularPrecoComDesconto(double preco, int percentualDesconto)
         {
-            return preco * (1 - percentualDesconto / 100.0);
+            return Math.Round(preco * (1 - percentualDesconto / 100.0), 2);
         }
 
         private static int PrioridadeStatus(string? status) => status?.ToUpper() switch

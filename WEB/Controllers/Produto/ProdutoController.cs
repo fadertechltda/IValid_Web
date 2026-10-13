@@ -1,5 +1,6 @@
 using DOMAIN.Model.Produto;
 using DOMAIN.Model.Configuracao;
+using DOMAIN.Model.Categoria;
 using Microsoft.AspNetCore.Mvc;
 using System.Text;
 using System.Text.Json;
@@ -16,6 +17,7 @@ namespace WEB.Controllers.Produto
         private readonly ILogger<ProdutoController> _logger = logger;
         private readonly string _apiUrl = "api/Produto";
         private readonly string _apiUrlConfiguracao = "api/Configuracao";
+        private readonly string _apiUrlCategoria = "api/Categoria";
 
         private string SupermercadoId => User.FindFirst("SupermercadoId")?.Value ?? string.Empty;
 
@@ -41,6 +43,7 @@ namespace WEB.Controllers.Produto
         public async Task<IActionResult> Create()
         {
             ViewData["Configuracao"] = await ObterConfiguracao();
+            ViewData["Categorias"] = await ObterCategorias();
             return View();
         }
 
@@ -71,6 +74,7 @@ namespace WEB.Controllers.Produto
             }
 
             ViewData["Configuracao"] = await ObterConfiguracao();
+            ViewData["Categorias"] = await ObterCategorias();
             return View(produto);
         }
 
@@ -90,6 +94,7 @@ namespace WEB.Controllers.Produto
             var produto = JsonSerializer.Deserialize<ProdutoModel>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true });
 
             ViewData["Configuracao"] = await ObterConfiguracao();
+            ViewData["Categorias"] = await ObterCategorias();
             return View(produto);
         }
 
@@ -122,6 +127,7 @@ namespace WEB.Controllers.Produto
             }
 
             ViewData["Configuracao"] = await ObterConfiguracao();
+            ViewData["Categorias"] = await ObterCategorias();
             return View(produto);
         }
 
@@ -168,6 +174,26 @@ namespace WEB.Controllers.Produto
             }
 
             return RedirectToAction(nameof(Index));
+        }
+
+        private async Task<List<CategoriaModel>> ObterCategorias()
+        {
+            try
+            {
+                var response = await _httpClient.GetAsync(_apiUrlCategoria);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var jsonString = await response.Content.ReadAsStringAsync();
+                    return JsonSerializer.Deserialize<List<CategoriaModel>>(jsonString, new JsonSerializerOptions { PropertyNameCaseInsensitive = true }) ?? [];
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Erro de conexão com a API ao buscar categorias");
+            }
+
+            return [];
         }
 
         private async Task<ConfiguracaoModel> ObterConfiguracao()

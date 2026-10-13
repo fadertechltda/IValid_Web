@@ -41,6 +41,15 @@ namespace DOMAIN.Model.Produto
         [FirestoreProperty("supermercadoId")]
         public string? SupermercadoId { get; set; }
 
+        [FirestoreProperty("brand")]
+        public string? Marca { get; set; }
+
+        [FirestoreProperty("categoryId")]
+        public string? CategoriaId { get; set; }
+
+        [FirestoreProperty("storeName")]
+        public string? NomeSupermercado { get; set; }
+
         public bool Esgotado => Quantidade <= 0;
 
         public ProdutoModel()

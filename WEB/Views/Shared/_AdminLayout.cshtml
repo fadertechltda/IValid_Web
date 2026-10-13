@@ -426,6 +426,16 @@
                     <span class="icon"><i class="fas fa-users"></i></span>
                     Funcionários
                 </a>
+                <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Categoria" ? "active" : "")"
+                   asp-controller="Categoria" asp-action="Index">
+                    <span class="icon"><i class="fas fa-tags"></i></span>
+                    Categorias
+                </a>
+                <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Ong" ? "active" : "")"
+                   asp-controller="Ong" asp-action="Index">
+                    <span class="icon"><i class="fas fa-hand-holding-heart"></i></span>
+                    ONGs
+                </a>
                 <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Configuracoes" ? "active" : "")"
                    asp-controller="Configuracao" asp-action="Index">
                     <span class="icon"><i class="fas fa-cog"></i></span>

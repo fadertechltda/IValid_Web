@@ -1,0 +1,85 @@
+@using DOMAIN.Model.Ong
+@model OngModel
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "ONGs";
+    ViewData["ActivePage"] = "Ong";
+    ViewData["PageTitle"] = "ONGs parceiras";
+    ViewData["PageSubtitle"] = "Instituições que recebem as doações feitas pelo aplicativo (compartilhadas entre as lojas).";
+    var ongs = ViewData["Ongs"] as List<OngModel> ?? [];
+    var editando = !string.IsNullOrEmpty(Model.Id);
+}
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="admin-card">
+            <div class="admin-card-header">
+                <h2 class="admin-card-title"><i class="fas fa-hand-holding-heart me-2" style="color:var(--verde)"></i>@(editando ? "Editar ONG" : "Nova ONG")</h2>
+            </div>
+            <div class="p-4">
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert-admin danger mb-3"><i class="fas fa-exclamation-circle"></i> @Html.ValidationSummary(false)</div>
+                }
+                <form asp-controller="Ong" asp-action="Salvar" method="post">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" asp-for="Id" />
+                    <label class="form-label-custom">Nome *</label>
+                    <input asp-for="Nome" class="form-control form-control-custom w-100 mb-3" maxlength="120" />
+                    <label class="form-label-custom">Cidade</label>
+                    <input asp-for="Cidade" class="form-control form-control-custom w-100 mb-3" maxlength="120" />
+                    <label class="form-label-custom">Descrição</label>
+                    <textarea asp-for="Descricao" class="form-control form-control-custom w-100 mb-3" rows="3" maxlength="500"></textarea>
+                    <label class="form-label-custom">URL da imagem</label>
+                    <input asp-for="UrlImagem" type="url" class="form-control form-control-custom w-100 mb-3" placeholder="https://..." />
+                    <div class="form-check mb-3">
+                        <input asp-for="Ativa" class="form-check-input" />
+                        <label asp-for="Ativa" class="form-check-label">Ativa (aparece no aplicativo)</label>
+                    </div>
+                    <div class="d-flex justify-content-end gap-2">
+                        @if (editando)
+                        {
+                            <a asp-controller="Ong" asp-action="Index" class="btn-outline-custom" style="text-decoration:none;">Cancelar</a>
+                        }
+                        <button type="submit" class="btn-success-custom"><i class="fas fa-save me-1"></i> Salvar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="admin-card">
+            <div class="table-responsive">
+                <table class="table admin-table mb-0">
+                    <thead>
+                        <tr><th>Nome</th><th>Cidade</th><th>Situação</th><th style="text-align:center">Ações</th></tr>
+                    </thead>
+                    <tbody>
+                        @if (ongs.Count == 0)
+                        {
+                            <tr><td colspan="4" class="text-center text-muted py-4">Nenhuma ONG cadastrada.</td></tr>
+                        }
+                        @foreach (var ong in ongs)
+                        {
+                            <tr>
+                                <td style="font-weight:600;">@ong.Nome</td>
+                                <td>@ong.Cidade</td>
+                                <td><span class="@(ong.Ativa ? "badge-verde" : "badge-vermelho")">@(ong.Ativa ? "ATIVA" : "INATIVA")</span></td>
+                                <td class="text-center">
+                                    <div class="d-inline-flex gap-2">
+                                        <a asp-controller="Ong" asp-action="Index" asp-route-editar="@ong.Id" class="btn-outline-custom" style="text-decoration:none;" title="Editar"><i class="fas fa-pen"></i></a>
+                                        <form asp-controller="Ong" asp-action="Excluir" asp-route-id="@ong.Id" method="post" onsubmit="return confirm('Excluir a ONG @ong.Nome?');">
+                                            @Html.AntiForgeryToken()
+                                            <button type="submit" class="btn-danger-custom" title="Excluir"><i class="fas fa-trash"></i></button>
+                                        </form>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -9,8 +9,27 @@
     ViewData["PageSubtitle"] = "Informações completas do pedido";
 }
 
+@{
+    var proximosStatus = StatusPedidoUtil.ProximosStatus(Model?.Status);
+    var rotulosAcao = new Dictionary<string, (string Texto, string Icone, string Classe)>
+    {
+        [StatusPedidoUtil.Separado] = ("Marcar como separado", "fa-box", "btn-outline-custom"),
+        [StatusPedidoUtil.EmRota] = ("Saiu para entrega", "fa-truck", "btn-outline-custom"),
+        [StatusPedidoUtil.Finalizado] = ("Finalizar pedido", "fa-check", "btn-success-custom"),
+        [StatusPedidoUtil.Cancelado] = ("Cancelar pedido", "fa-times", "btn-danger-custom")
+    };
+}
+
 <div class="row justify-content-center">
     <div class="col-xl-8">
+
+        @if (Model?.EstornoPendente == true)
+        {
+            <div class="alert-admin danger mb-4">
+                <i class="fas fa-exclamation-triangle"></i>
+                Pedido cancelado após o pagamento online. Faça o estorno ao cliente pelo InfinitePay.
+            </div>
+        }
 
         <div class="mb-4 d-flex align-items-center gap-3 p-3"
              style="background:white; border-radius:14px; box-shadow:0 2px 10px rgba(0,0,0,0.06); border:1px solid #eef0f4;">
@@ -19,7 +38,8 @@
                 <div style="font-weight:700;font-size:16px;color:#1a1a2e;">@(Model?.ClienteNome ?? "Cliente não encontrado")</div>
                 <div style="font-size:12px;color:#aaa;margin-top:2px;">ID do Usuário: @Model?.UsuarioId</div>
                 <div style="font-size:12px;color:#aaa;margin-top:2px;">@Model?.Endereco</div>
-                <div style="font-size:11px;color:#aaa;margin-top:2px;">Forma de pagamento: @Model?.FormaPagamento</div>
+                <div style="font-size:11px;color:#aaa;margin-top:2px;">Forma de pagamento: @(Model?.FormaPagamentoExibicao ?? "-")</div>
+                <div style="font-size:11px;color:#aaa;margin-top:2px;">Pagamento: @(Model?.StatusPagamento ?? "-")</div>
                 <div style="font-size:11px;color:#aaa;margin-top:2px;">ID do Pedido: @Model?.Id</div>
             </div>
 
@@ -37,6 +57,7 @@
                         <tr>
                             <th>Produto</th>
                             <th>Quantidade</th>
+                            <th>Preço unitário</th>
                             <th>Subtotal</th>
                         </tr>
                     </thead>
@@ -46,8 +67,15 @@
                             @foreach (var item in Model.Itens)
                             {
                                 <tr>
-                                    <td style="font-weight:600;font-size:13px;color:#1a1a2e;">@item.NomeProduto</td>
+                                    <td style="font-weight:600;font-size:13px;color:#1a1a2e;">
+                                        @item.NomeProduto
+                                        @if (item.EhDoacao)
+                                        {
+                                            <span class="badge-verde ms-2" style="font-size:10px;">DOAÇÃO</span>
+                                        }
+                                    </td>
                                     <td>@item.Quantidade</td>
+                                    <td>@(item.PrecoUnitario > 0 ? "R$ " + item.PrecoUnitario.ToString("F2") : "-")</td>
                                     <td style="font-weight:700;">R$ @item.Subtotal.ToString("F2")</td>
                                 </tr>
                             }
@@ -62,12 +90,26 @@
                     <div style="font-weight:600;font-size:14px;">@Model?.DataPedido.ToString("dd/MM/yyyy HH:mm")</div>
                 </div>
                 <div class="text-end">
+                    @if (Model?.CashbackUsado > 0)
+                    {
+                        <div style="font-size:12px;color:#aaa;">Subtotal R$ @Model.Subtotal.ToString("F2") · Cashback -R$ @Model.CashbackUsado.ToString("F2")</div>
+                    }
                     <div style="font-size:12px;color:#aaa;">Valor Total</div>
                     <div style="font-weight:700;font-size:20px;color:var(--verde);">R$ @Model?.Total.ToString("F2")</div>
                 </div>
             </div>
 
-            <div class="p-4 pt-0 d-flex justify-content-end">
+            <div class="p-4 pt-0 d-flex justify-content-end flex-wrap gap-2">
+                @foreach (var status in proximosStatus)
+                {
+                    (string Texto, string Icone, string Classe) acao = rotulosAcao.TryGetValue(status, out var rotulo) ? rotulo : (status, "fa-arrow-right", "btn-outline-custom");
+                    <form asp-controller="Pedido" asp-action="AtualizarStatus" asp-route-id="@Model?.Id" method="post"
+                          onsubmit="return confirm('Confirmar: @acao.Texto?');">
+                        @Html.AntiForgeryToken()
+                        <input type="hidden" name="status" value="@status" />
+                        <button type="submit" class="@acao.Classe"><i class="fas @acao.Icone me-1"></i> @acao.Texto</button>
+                    </form>
+                }
                 <a asp-controller="Pedido" asp-action="Index" class="btn-outline-custom" style="text-decoration:none;">
                     <i class="fas fa-arrow-left me-1"></i> Voltar
                 </a>
