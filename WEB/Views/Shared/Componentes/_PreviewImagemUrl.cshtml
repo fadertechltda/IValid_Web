@@ -1,0 +1,122 @@
+@*
+    Pré-visualização da imagem do produto. Carrega a imagem assim que o link é colado
+    e só libera o envio do formulário quando ela carregou de verdade.
+    Uso: o formulário precisa ter um <input id="UrlImagem">.
+*@
+<div class="col-12" id="previewImagemProduto" aria-live="polite">
+    <div id="previewImagemCaixa"
+         style="display:flex; align-items:center; gap:14px; padding:12px 14px; border:1.5px dashed #e8eaef; border-radius:10px; background:#f8f9fc;">
+        <div id="previewImagemMoldura"
+             style="width:96px; height:96px; flex:none; border-radius:10px; background:#f0f2f6; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+            <i id="previewImagemIcone" class="fas fa-image" style="color:#ccc; font-size:28px;"></i>
+            <img id="previewImagemImg" alt="Prévia da imagem do produto" referrerpolicy="no-referrer"
+                 style="display:none; width:100%; height:100%; object-fit:cover;" />
+        </div>
+        <div id="previewImagemStatus" style="font-size:13px; color:#8a8fa3;">
+            Cole o link da imagem para ver a prévia. O produto só é salvo com uma imagem válida.
+        </div>
+    </div>
+</div>
+
+<script>
+    (function () {
+        var entrada = document.getElementById('UrlImagem');
+        if (!entrada) return;
+
+        var img = document.getElementById('previewImagemImg');
+        var icone = document.getElementById('previewImagemIcone');
+        var status = document.getElementById('previewImagemStatus');
+        var caixa = document.getElementById('previewImagemCaixa');
+        var tempoLimiteMs = 10000;
+        var espera = null;
+        var tentativa = 0;
+
+        function mostrar(estado, mensagem) {
+            var cores = { vazio: '#8a8fa3', carregando: '#8a8fa3', ok: '#1e8e3e', erro: '#d93025' };
+            status.textContent = mensagem;
+            status.style.color = cores[estado];
+            caixa.style.borderColor = estado === 'erro' ? '#f1b0aa' : (estado === 'ok' ? '#a8d5b5' : '#e8eaef');
+            img.style.display = estado === 'ok' ? 'block' : 'none';
+            icone.style.display = estado === 'ok' ? 'none' : 'block';
+            icone.className = estado === 'carregando' ? 'fas fa-spinner fa-spin' : 'fas fa-image';
+        }
+
+        function bloquear(mensagem) {
+            entrada.setCustomValidity(mensagem);
+        }
+
+        function urlHttp(valor) {
+            try {
+                var u = new URL(valor);
+                return u.protocol === 'http:' || u.protocol === 'https:';
+            } catch (e) {
+                return false;
+            }
+        }
+
+        function verificar() {
+            var valor = entrada.value.trim();
+            var minha = ++tentativa;
+
+            if (!valor) {
+                mostrar('vazio', 'Cole o link da imagem para ver a prévia. O produto só é salvo com uma imagem válida.');
+                bloquear('Informe o link da imagem do produto.');
+                return;
+            }
+            if (!urlHttp(valor)) {
+                mostrar('erro', 'O link precisa começar com http:// ou https://.');
+                bloquear('O link da imagem não é válido.');
+                return;
+            }
+
+            mostrar('carregando', 'Carregando a imagem...');
+            bloquear('Aguarde a imagem carregar.');
+
+            var teste = new Image();
+            teste.referrerPolicy = 'no-referrer';
+            var limite = setTimeout(function () {
+                if (minha !== tentativa) return;
+                teste.onload = teste.onerror = null;
+                mostrar('erro', 'A imagem demorou demais para carregar. Confira o link.');
+                bloquear('Não foi possível carregar a imagem deste link.');
+            }, tempoLimiteMs);
+
+            teste.onload = function () {
+                clearTimeout(limite);
+                if (minha !== tentativa) return;
+                img.src = valor;
+                mostrar('ok', 'Imagem carregada (' + teste.naturalWidth + ' × ' + teste.naturalHeight + ' px).');
+                bloquear('');
+            };
+            teste.onerror = function () {
+                clearTimeout(limite);
+                if (minha !== tentativa) return;
+                mostrar('erro', 'Não foi possível carregar esta imagem. Use o link direto da imagem (https://...).');
+                bloquear('Não foi possível carregar a imagem deste link.');
+            };
+            teste.src = valor;
+        }
+
+        function agendar() {
+            clearTimeout(espera);
+            bloquear('Aguarde a imagem carregar.');
+            espera = setTimeout(verificar, 500);
+        }
+
+        entrada.addEventListener('input', agendar);
+        entrada.addEventListener('change', verificar);
+        entrada.addEventListener('paste', function () { setTimeout(verificar, 0); });
+
+        var formulario = entrada.form;
+        if (formulario) {
+            formulario.addEventListener('submit', function (evento) {
+                if (!entrada.checkValidity()) {
+                    evento.preventDefault();
+                    entrada.reportValidity();
+                }
+            });
+        }
+
+        verificar();
+    })();
+</script>

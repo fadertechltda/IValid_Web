@@ -32,9 +32,9 @@ namespace DOMAIN.Validador.Produto
             RuleFor(produto => produto.UrlImagem)
                 .NotEmpty()
                 .WithMessage("A imagem do produto é obrigatória.")
-                .Must(uri => Uri.TryCreate(uri, UriKind.Absolute, out _))
+                .Must(UrlHttpValida)
                 .When(produto => !string.IsNullOrEmpty(produto.UrlImagem))
-                .WithMessage("A URL da imagem não é válida.");
+                .WithMessage("A URL da imagem deve ser um endereço http ou https válido.");
 
         }
 
@@ -68,11 +68,15 @@ namespace DOMAIN.Validador.Produto
             RuleFor(produto => produto.UrlImagem)
                 .NotEmpty()
                 .WithMessage("A imagem do produto é obrigatória.")
-                .Must(uri => Uri.TryCreate(uri, UriKind.Absolute, out _))
+                .Must(UrlHttpValida)
                 .When(produto => !string.IsNullOrEmpty(produto.UrlImagem))
-                .WithMessage("A URL da imagem não é válida.");
+                .WithMessage("A URL da imagem deve ser um endereço http ou https válido.");
 
         }
+
+        private static bool UrlHttpValida(string? url) =>
+            Uri.TryCreate(url, UriKind.Absolute, out Uri? uri)
+            && (uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps);
 
         public override void AssineRegrasExclusao()
         {

@@ -122,6 +122,8 @@
                             <span asp-validation-for="UrlImagem" class="text-danger" style="font-size:12px;"></span>
                         </div>
 
+                        @await Html.PartialAsync("~/Views/Shared/Componentes/_PreviewImagemUrl.cshtml")
+
                         @{ ViewData["TipoAlerta"] = "Editar"; }
                         @await Html.PartialAsync("~/Views/Shared/Componentes/_InfoCamposCalculados.cshtml")
 

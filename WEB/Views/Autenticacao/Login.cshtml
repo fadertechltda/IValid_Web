@@ -287,7 +287,7 @@
                     <div class="mb-3">
                         <label asp-for="Senha" class="form-label-custom">Senha</label>
                         <div style="position: relative;">
-                            <input asp-for="Senha" type="password" id="campoSenha" class="form-control form-control-custom" placeholder="••••••••" required autocomplete="current-password" />
+                            <input asp-for="Senha" type="password" id="campoSenha" class="form-control form-control-custom" placeholder="Digite sua senha" required autocomplete="current-password" />
                             <button type="button" onclick="toggleSenha('campoSenha', this)" style="position: absolute; right: 10px; top: 12px; border: none; background: transparent; color: var(--text-muted-custom); cursor: pointer; outline: none;">
                                 <i class="far fa-eye"></i>
                             </button>
@@ -296,12 +296,19 @@
 
                     <a asp-controller="Autenticacao" asp-action="EsqueciSenha" class="forgot-password">Esqueceu a senha?</a>
 
+                    <div class="form-check mb-3" style="clear: both;">
+                        <input class="form-check-input" type="checkbox" id="lembrarLoja" name="lembrarLoja" value="true" checked />
+                        <label class="form-check-label" for="lembrarLoja" style="font-size:13px; color:var(--text-muted-custom);">
+                            Lembrar esta loja neste computador (pula o código nas próximas vezes)
+                        </label>
+                    </div>
+
                     <button type="submit" name="etapa" value="entrar" class="btn-login">
                         Entrar no Painel <i class="fas fa-arrow-right ms-2"></i>
                     </button>
 
                     <div class="text-center mt-3">
-                        <a asp-controller="Autenticacao" asp-action="Login" style="font-size:13px; color:var(--text-muted-custom); text-decoration:none;">
+                        <a asp-controller="Autenticacao" asp-action="TrocarLoja" style="font-size:13px; color:var(--text-muted-custom); text-decoration:none;">
                             <i class="fas fa-arrow-left me-1"></i> Trocar de loja
                         </a>
                     </div>

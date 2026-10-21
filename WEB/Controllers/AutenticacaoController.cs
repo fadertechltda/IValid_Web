@@ -3,32 +3,52 @@ using DOMAIN.Model.Usuario;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using System.Text.Json;
 
 namespace WEB.Controllers
 {
     [AllowAnonymous]
-    public class AutenticacaoController(IHttpClientFactory httpClientFactory, ILogger<AutenticacaoController> logger) : Controller
+    public class AutenticacaoController(IHttpClientFactory httpClientFactory, ILogger<AutenticacaoController> logger, IDataProtectionProvider protecaoDados) : Controller
     {
+        private const string CookieLojaLembrada = "ivalid_loja";
+        private const int DiasLojaLembrada = 90;
+
+        private readonly IDataProtector _protetorLoja = protecaoDados.CreateProtector("IValid.LojaLembrada");
         private readonly HttpClient _clienteHttp = httpClientFactory.CreateClient("IValidApi");
         private readonly ILogger<AutenticacaoController> _logger = logger;
 
         [HttpGet]
-        public IActionResult Login()
+        public async Task<IActionResult> Login()
         {
             if (User.Identity != null && User.Identity.IsAuthenticated)
             {
                 return RedirectToAction("Index", "Home");
             }
+
+            string? codigoLembrado = LerLojaLembrada();
+            if (codigoLembrado is not null)
+            {
+                return await CarregarUsuariosDaLoja(new LoginModel { CodigoLoja = codigoLembrado });
+            }
+
             return View(new LoginModel());
+        }
+
+        [HttpGet]
+        public IActionResult TrocarLoja()
+        {
+            Response.Cookies.Delete(CookieLojaLembrada);
+            return RedirectToAction(nameof(Login));
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginModel modeloLogin, string etapa)
+        public async Task<IActionResult> Login(LoginModel modeloLogin, string etapa, bool lembrarLoja)
         {
             if (string.IsNullOrEmpty(modeloLogin.CodigoLoja))
             {
@@ -89,6 +109,8 @@ namespace WEB.Controllers
                             new ClaimsPrincipal(identidadeReivindicacoes),
                             propriedadesAutenticacao);
 
+                        AtualizarLojaLembrada(modeloLogin.CodigoLoja!, lembrarLoja);
+
                         return RedirectToAction("Index", "Home");
                     }
 
@@ -107,6 +129,42 @@ namespace WEB.Controllers
             }
 
             return await CarregarUsuariosDaLoja(modeloLogin);
+        }
+
+        private string? LerLojaLembrada()
+        {
+            if (!Request.Cookies.TryGetValue(CookieLojaLembrada, out string? valor) || string.IsNullOrEmpty(valor))
+            {
+                return null;
+            }
+
+            try
+            {
+                return _protetorLoja.Unprotect(valor);
+            }
+            catch (CryptographicException)
+            {
+                Response.Cookies.Delete(CookieLojaLembrada);
+                return null;
+            }
+        }
+
+        private void AtualizarLojaLembrada(string codigoLoja, bool lembrar)
+        {
+            if (!lembrar)
+            {
+                Response.Cookies.Delete(CookieLojaLembrada);
+                return;
+            }
+
+            Response.Cookies.Append(CookieLojaLembrada, _protetorLoja.Protect(codigoLoja), new CookieOptions
+            {
+                HttpOnly = true,
+                Secure = Request.IsHttps,
+                SameSite = SameSiteMode.Strict,
+                IsEssential = true,
+                Expires = DateTimeOffset.UtcNow.AddDays(DiasLojaLembrada)
+            });
         }
 
         private async Task<IActionResult> CarregarUsuariosDaLoja(LoginModel modeloLogin)
