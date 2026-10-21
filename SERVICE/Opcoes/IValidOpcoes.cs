@@ -1,5 +1,14 @@
 namespace SERVICE.Opcoes
 {
+    public class EmailOpcoes
+    {
+        public string ResendApiKey { get; set; } = string.Empty;
+
+        public string Remetente { get; set; } = string.Empty;
+
+        public string NomeRemetente { get; set; } = "IValid";
+    }
+
     public class PagamentoOpcoes
     {
         public string InfinitePayHandle { get; set; } = string.Empty;

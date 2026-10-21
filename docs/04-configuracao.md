@@ -10,10 +10,8 @@ O ASP.NET Core lê, nesta ordem (o último vence): `appsettings.json`, `appsetti
 | `Firebase:ProjectId` | Sim | `ivalid-9396b` | Projeto do Firestore e emissor esperado do token do app. |
 | `Firebase:CredentialsPath` | Sim (exceto com emulador) | `../Chave/Chave_Firebase.json` | Caminho do JSON da conta de serviço, relativo à pasta da API. Vira `GOOGLE_APPLICATION_CREDENTIALS`. |
 | `Firebase:ApiKey` | Sim | valor do projeto | *Web API key* do Firebase, usada nas chamadas REST de login, cadastro, redefinição de senha e exclusão de usuário. |
-| `Email:Host` | Não | `smtp.gmail.com` | Servidor SMTP do e-mail com o código de acesso. |
-| `Email:Porta` | Não | `587` | Porta SMTP (SSL ligado). |
-| `Email:EmailRemetente` | Não | exemplo | Conta remetente. |
-| `Email:SenhaRemetente` | Não | exemplo | Senha (ou senha de app) da conta. |
+| `Email:ResendApiKey` | Para enviar e-mail | vazio | Chave de API do Resend (permissão *Sending access*). Defina só por variável de ambiente (`Email__ResendApiKey`), nunca no Git. Vazia: o cadastro funciona, mas o código de acesso não é enviado (aviso no log). |
+| `Email:Remetente` | Para enviar e-mail | `no-reply@mail.ivalid.com.br` | Endereço remetente. Precisa pertencer a um domínio verificado no Resend. |
 | `Email:NomeRemetente` | Não | `IValid` | Nome exibido. |
 | `Pagamento:InfinitePayHandle` | Para pagamento online | `lucas-freitas-fe` | InfiniteTag da conta que recebe. Sem ela, gerar link de pagamento falha. |
 | `Pagamento:InfinitePayBaseUrl` | Não | `https://api.checkout.infinitepay.io` | URL da API do InfinitePay. |
