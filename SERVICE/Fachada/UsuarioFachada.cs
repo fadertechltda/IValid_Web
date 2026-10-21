@@ -42,13 +42,8 @@ namespace SERVICE.Fachada
 
             if (!string.IsNullOrEmpty(codigoAcesso))
             {
-                try
-                {
-                    await _emailProcesso.EnviarCodigoAcessoAsync(registro.Email!, registro.NomeSupermercado ?? "seu supermercado", codigoAcesso);
-                }
-                catch (Exception)
-                {
-                }
+                // Envio em segundo plano: o cadastro não espera o provedor de e-mail (falhas só vão para o log).
+                _ = _emailProcesso.EnviarCodigoAcessoAsync(registro.Email!, registro.NomeSupermercado ?? "seu supermercado", codigoAcesso);
             }
 
             return codigoAcesso;

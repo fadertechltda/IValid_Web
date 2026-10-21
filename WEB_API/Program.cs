@@ -50,13 +50,13 @@ builder.Services.AddScoped<ProdutoProcesso>();
 builder.Services.AddScoped<ProdutoFachada>();
 builder.Services.AddScoped<ProdutoValidacao>();
 
-var emailHost = builder.Configuration["Email:Host"];
-var emailPorta = builder.Configuration.GetValue<int>("Email:Porta", 587);
-var emailRemetente = builder.Configuration["Email:EmailRemetente"];
-var emailSenhaRemetente = builder.Configuration["Email:SenhaRemetente"];
-var emailNomeRemetente = builder.Configuration["Email:NomeRemetente"];
-
-builder.Services.AddScoped(_ => new EmailProcesso(emailHost, emailPorta, emailRemetente, emailSenhaRemetente, emailNomeRemetente));
+var emailOpcoes = builder.Configuration.GetSection("Email").Get<EmailOpcoes>() ?? new EmailOpcoes();
+builder.Services.AddSingleton(emailOpcoes);
+builder.Services.AddHttpClient<EmailProcesso>(cliente =>
+{
+    cliente.BaseAddress = new Uri("https://api.resend.com/");
+    cliente.Timeout = TimeSpan.FromSeconds(15);
+});
 
 builder.Services.AddScoped<IUsuarioMapeador, UsuarioMapeador>();
 builder.Services.AddScoped<UsuarioProcesso>();
