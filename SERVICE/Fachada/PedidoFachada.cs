@@ -33,6 +33,14 @@ namespace SERVICE.Fachada
 
         public Task<LinkPagamentoModel> GerarLinkPagamentoAsync(string uid, string id, string? nome, string? email) => _pagamentoProcesso.GerarLinkAsync(uid, id, nome, email);
 
+        public string ObterChavePublicaMercadoPago() => _pagamentoProcesso.ObterChavePublicaMercadoPago();
+
+        public Task<ResultadoPagamentoModel> PagarAsync(string uid, string id, string? email, PagarPedidoModel dados) => _pagamentoProcesso.PagarAsync(uid, id, email, dados);
+
+        public Task<ResultadoPagamentoModel> SincronizarPagamentoAsync(string uid, string id, string ordemId) => _pagamentoProcesso.SincronizarAsync(uid, id, ordemId);
+
+        public Task ProcessarNotificacaoMercadoPagoAsync(string ordemId) => _pagamentoProcesso.ProcessarNotificacaoOrdemAsync(ordemId);
+
         public Task<PedidoModel> ConfirmarPagamentoAsync(string uid, string id, ConfirmarPagamentoModel dados) => _pagamentoProcesso.ConfirmarAsync(uid, id, dados);
     }
 }

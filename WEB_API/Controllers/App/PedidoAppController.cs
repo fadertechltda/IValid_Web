@@ -37,6 +37,14 @@ namespace WEB_API.Controllers.App
         public Task<IActionResult> Cancelar(string id) =>
             ExecutarAsync(async () => Ok(await _pedidoFachada.CancelarPeloClienteAsync(UsuarioId, id)));
 
+        [HttpPost("{id}/pagamento")]
+        public Task<IActionResult> Pagar(string id, [FromBody] PagarPedidoModel dados) =>
+            ExecutarAsync(async () => Ok(await _pedidoFachada.PagarAsync(UsuarioId, id, EmailUsuario, dados)));
+
+        [HttpPost("{id}/pagamento/sincronizar")]
+        public Task<IActionResult> SincronizarPagamento(string id, [FromBody] SincronizarPagamentoModel dados) =>
+            ExecutarAsync(async () => Ok(await _pedidoFachada.SincronizarPagamentoAsync(UsuarioId, id, dados.OrdemId!)));
+
         [HttpPost("{id}/pagamento/link")]
         public Task<IActionResult> GerarLinkPagamento(string id) =>
             ExecutarAsync(async () => Ok(await _pedidoFachada.GerarLinkPagamentoAsync(UsuarioId, id, NomeUsuario, EmailUsuario)));

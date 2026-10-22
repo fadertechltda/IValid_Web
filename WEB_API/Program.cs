@@ -84,7 +84,10 @@ builder.Services.AddScoped<DashboardFachada>();
 
 var pagamentoOpcoes = builder.Configuration.GetSection("Pagamento").Get<PagamentoOpcoes>() ?? new PagamentoOpcoes();
 var notificacaoOpcoes = builder.Configuration.GetSection("Notificacoes").Get<NotificacaoOpcoes>() ?? new NotificacaoOpcoes();
+var mercadoPagoOpcoes = builder.Configuration.GetSection("MercadoPago").Get<MercadoPagoOpcoes>() ?? new MercadoPagoOpcoes();
 builder.Services.AddSingleton(pagamentoOpcoes);
+builder.Services.AddSingleton(mercadoPagoOpcoes);
+builder.Services.AddSingleton(builder.Configuration.GetSection("Repasse").Get<RepasseOpcoes>() ?? new RepasseOpcoes());
 builder.Services.AddSingleton(notificacaoOpcoes);
 
 builder.Services.AddScoped<ICategoriaMapeador, CategoriaMapeador>();
@@ -104,6 +107,8 @@ builder.Services.AddScoped<ClienteProcesso>();
 builder.Services.AddScoped<INotificacaoProcesso, NotificacaoProcesso>();
 builder.Services.AddScoped<PagamentoProcesso>();
 builder.Services.AddScoped<RotinaProcesso>();
+builder.Services.AddScoped<RepasseProcesso>();
+builder.Services.AddScoped<RepasseFachada>();
 
 builder.Services.AddScoped<VitrineFachada>();
 builder.Services.AddScoped<ClienteFachada>();
@@ -115,6 +120,12 @@ builder.Services.AddHttpClient<InfinitePayCliente>(cliente =>
 {
     cliente.BaseAddress = new Uri(pagamentoOpcoes.InfinitePayBaseUrl.TrimEnd('/') + "/");
     cliente.Timeout = TimeSpan.FromSeconds(20);
+});
+
+builder.Services.AddHttpClient<MercadoPagoCliente>(cliente =>
+{
+    cliente.BaseAddress = new Uri(mercadoPagoOpcoes.BaseUrl.TrimEnd('/') + "/");
+    cliente.Timeout = TimeSpan.FromSeconds(30);
 });
 
 builder.Services.AddHostedService<RotinaDiariaService>();

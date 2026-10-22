@@ -78,6 +78,7 @@ Todas exigem `X-Internal-Api-Key`. As que recebem `supermercadoId` usam esse val
 | Método | Rota | Uso |
 |---|---|---|
 | GET | `api/Dashboard?supermercadoId=` | `DashboardModel`: contagens por faixa, valor em risco, 5 produtos urgentes, faturamento e lucro. |
+| GET | `api/Repasse?supermercadoId=` | `ResumoRepasseModel`: total a repassar e fechamentos semanais (segunda a domingo, UTC-3) com vendas brutas, comissão, valor líquido, pagamento previsto (quarta seguinte) e pedidos. Entram só pedidos pagos online, `FINALIZADO` e sem estorno pendente. |
 | GET / PUT | `api/Configuracao?supermercadoId=` / `api/Configuracao` | Percentuais de desconto da loja (`percentualDescontoAmarelo`, `percentualDescontoVermelho`). |
 | GET | `api/Funcionario?supermercadoId=` | Funcionários da loja, com o nome do perfil. |
 | GET | `api/Funcionario/{id}?supermercadoId=` | Um funcionário. |
@@ -150,6 +151,9 @@ Uma conta do painel (documento em `users` com `supermercadoId`) recebe `403` nes
 | POST | `/` | `CriarPedidoModel` | Cria o pedido. `201` com o pedido. |
 | GET | `/` e `{id}` | | Pedidos do cliente. |
 | POST | `{id}/cancelar` | | Só em `PENDENTE` ou `CONFIRMADO`. Devolve estoque e cashback. |
+| POST | `{id}/pagamento` | `{ metodo: "pix" \| "cartao", tokenCartao?, bandeiraId?, tipoCartao?, parcelas? }` | Cria a cobrança no Mercado Pago. Pix devolve `qrCode`, `qrCodeBase64` e `ticketUrl`; cartão usa o token gerado no app. Marca como pago só após consultar a ordem no Mercado Pago. |
+| POST | `{id}/pagamento/sincronizar` | `{ ordemId }` | Reconsulta a ordem no Mercado Pago (usado após o Pix). |
+| POST | `/api/app/pagamentos/mercadopago/webhook` | notificação do Mercado Pago | Anônimo. Só o id da ordem é lido; o estado real é consultado na API do Mercado Pago. |
 | POST | `{id}/pagamento/link` | | Gera o link do InfinitePay (pedido `Online` em `PENDENTE`). Retorna `{ pedidoId, url, valor }`. |
 | POST | `{id}/pagamento/confirmar` | `{ transactionNsu, slug, captureMethod?, receiptUrl? }` | A API consulta o InfinitePay e só então marca como pago. |
 

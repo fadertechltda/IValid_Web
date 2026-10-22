@@ -18,6 +18,9 @@ O ASP.NET Core lê, nesta ordem (o último vence): `appsettings.json`, `appsetti
 | `Pagamento:RedirectUrl` | Não | `https://ivalid.invalid/pagamento-concluido` | Para onde o checkout do InfinitePay redireciona depois do pagamento. O retorno traz `transaction_nsu` e `slug`, que o app envia em `pagamento/confirmar`. |
 | `Pagamento:PermitirDemonstracao` | Não | `false` | Libera a forma `Demonstracao` (pedido pago sem cobrança). Use só em apresentação. |
 | `Pagamento:MinutosExpiracaoPedidoPendente` | Não | `30` | Prazo para pagar um pedido online antes de ser cancelado. |
+| `MercadoPago:AccessToken` | Para pagamento in-app | _(vazio)_ | Access Token da conta que recebe (cartão e Pix). **Informe somente por variável de ambiente** (`MercadoPago__AccessToken`), nunca no arquivo. |
+| `MercadoPago:BaseUrl` | Não | `https://api.mercadopago.com/` | URL da API do Mercado Pago. |
+| `Repasse:ComissaoPercentual` | Não | `1.49` | Comissão do IValid sobre cada pedido pago online (1.49 = 1,49%), descontada do repasse à loja. |
 | `Notificacoes:Habilitada` | Não | `true` | Liga/desliga o envio de push. |
 | `Notificacoes:TopicoOfertas` | Não | `ofertas` | Tópico FCM das ofertas diárias. O app precisa assinar o mesmo nome. |
 | `Rotinas:Habilitada` | Não | `true` | Liga/desliga o `RotinaDiariaService`. |

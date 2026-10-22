@@ -20,6 +20,9 @@ namespace WEB_API.Infraestrutura
             }
             catch (IValidExcecao ex)
             {
+                var logger = HttpContext.RequestServices.GetRequiredService<ILoggerFactory>().CreateLogger(GetType());
+                logger.LogWarning("{Caminho} recusado: {Codigo} - {Informacao}", HttpContext.Request.Path, ex.Codigo, ex.InformacaoAdicional);
+
                 var detalhes = new ExcecaoDetalhes { Codigo = ex.Codigo, InformacaoAdicional = ex.InformacaoAdicional };
 
                 return ex.Codigo switch

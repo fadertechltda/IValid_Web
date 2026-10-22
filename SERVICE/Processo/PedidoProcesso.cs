@@ -198,6 +198,12 @@ namespace SERVICE.Processo
             return pedido;
         }
 
+        public async Task<PedidoModel> ObterPorIdAsync(string id)
+        {
+            return await _pedidoMapeador.ListarPorIdAsync(id)
+                ?? throw new IValidExcecao(CodigoExcecao.EntidadeNaoEncontrada, "Pedido não encontrado.");
+        }
+
         public async Task<PedidoModel> CancelarPeloClienteAsync(string uid, string id)
         {
             var pedido = await ObterDoClienteAsync(uid, id);
