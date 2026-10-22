@@ -417,6 +417,14 @@
                     Pedidos
                 </a>
             }
+            @if (User.TemPermissao(PermissaoUtil.Financeiro))
+            {
+                <a class="sidebar-link @(ViewData["ActivePage"]?.ToString() == "Repasse" ? "active" : "")"
+                   asp-controller="Repasse" asp-action="Index">
+                    <span class="icon"><i class="fas fa-wallet"></i></span>
+                    Repasses
+                </a>
+            }
 
             @{
                 bool mostrarSistema = User.EhAdministrador()

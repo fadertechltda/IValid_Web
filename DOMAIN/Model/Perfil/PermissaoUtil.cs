@@ -19,7 +19,7 @@ namespace DOMAIN.Model.Perfil
         [
             new(Produtos, "Produtos", "Cadastrar, editar e excluir produtos."),
             new(Pedidos, "Pedidos", "Ver os pedidos e mudar o status."),
-            new(Financeiro, "Financeiro", "Ver faturamento, lucro e valor em risco no dashboard."),
+            new(Financeiro, "Financeiro", "Ver faturamento, lucro e valor em risco no dashboard, e os repasses."),
             new(Configuracoes, "Configurações", "Alterar descontos e dados da loja."),
             new(Categorias, "Categorias", "Cadastrar categorias de produto."),
             new(Ongs, "ONGs", "Cadastrar as ONGs parceiras.")
