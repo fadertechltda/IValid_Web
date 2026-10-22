@@ -17,6 +17,10 @@ namespace DOMAIN.Validador.Configuracao
             RuleFor(c => c.PercentualDescontoVermelho)
                 .InclusiveBetween(0, 100)
                 .WithMessage("O desconto do alerta vermelho deve estar entre 0 e 100%.");
+
+            RuleFor(c => c.PercentualDescontoVermelho)
+                .GreaterThanOrEqualTo(c => c.PercentualDescontoAmarelo)
+                .WithMessage("O desconto do alerta vermelho (vence primeiro) deve ser maior ou igual ao do alerta amarelo.");
         }
 
         public override void AssineRegrasExclusao()

@@ -1,4 +1,5 @@
 using Google.Cloud.Firestore;
+using System.Text.Json.Serialization;
 
 namespace DOMAIN.Model.Funcionario
 {
@@ -11,6 +12,7 @@ namespace DOMAIN.Model.Funcionario
         [FirestoreProperty("nome")]
         public string? Nome { get; set; }
 
+        [JsonIgnore]
         [FirestoreProperty("senhaHash")]
         public string? SenhaHash { get; set; }
 
